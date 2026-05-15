@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///C:/Users/mbauman/Downloads/cleargov-tracker_3.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearGov Onboarding Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="./ClearGov Onboarding Tracker_files/css2" rel="stylesheet">
+<link rel="stylesheet" href="./ClearGov Onboarding Tracker_files/tabler-icons.min.css">
+<script src="./ClearGov Onboarding Tracker_files/xlsx.full.min.js.download"></script>
+<style>
+  :root {
+    --bg: #F5F4F0;
+    --surface: #FFFFFF;
+    --surface2: #EEECEA;
+    --border: rgba(0,0,0,0.10);
+    --border-mid: rgba(0,0,0,0.18);
+    --text: #1A1916;
+    --text-muted: #6B6960;
+    --text-hint: #9E9D97;
+    --blue: #1A56A4;
+    --blue-bg: #E8F0FB;
+    --blue-text: #0C3D7A;
+    --green: #2A7A4B;
+    --green-bg: #E6F4EC;
+    --green-text: #1A5233;
+    --amber: #B06A10;
+    --amber-bg: #FDF0DC;
+    --amber-text: #7A4A0A;
+    --red: #C0392B;
+    --red-bg: #FDECEB;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-dot {
+    width: 28px; height: 28px;
+    background: var(--blue);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 15px;
+  }
+  .brand-name { font-size: 16px; font-weight: 600; color: var(--text); }
+  .brand-name span { color: var(--blue); }
+  .header-actions { display: flex; gap: 8px; }
+
+  /* ── Buttons ── */
+  .btn {
+    height: 36px; padding: 0 16px;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border-mid);
+    background: var(--surface);
+    color: var(--text);
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn-primary:hover { background: #0C3D7A; border-color: #0C3D7A; }
+  .btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+  .btn-ghost { border-color: transparent; background: transparent; }
+  .btn-ghost:hover { background: var(--surface2); border-color: var(--border); }
+  .btn-danger { color: var(--red); border-color: transparent; background: transparent; }
+  .btn-danger:hover { background: var(--red-bg); }
+
+  /* ── Layout ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+  /* ── Stats ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+  }
+  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; }
+  .stat-card.highlight { background: var(--blue); border-color: var(--blue); }
+  .stat-card.highlight .stat-label { color: rgba(255,255,255,0.7); }
+  .stat-card.highlight .stat-value { color: #fff; }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 1.25rem; flex-wrap: wrap;
+  }
+  .search-wrap {
+    position: relative; flex: 1; min-width: 180px;
+  }
+  .search-wrap i {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--text-hint); font-size: 16px; pointer-events: none;
+  }
+  .search-wrap input {
+    width: 100%; height: 38px;
+    padding: 0 12px 0 36px;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+  }
+  .search-wrap input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,164,0.1); }
+  select {
+    height: 38px; padding: 0 12px;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+  }
+  select:focus { outline: none; border-color: var(--blue); }
+
+  /* ── Cards ── */
+  .cards-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .muni-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .muni-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-mid); }
+
+  .card-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; cursor: pointer; user-select: none;
+  }
+
+  .avatar {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+
+  .card-meta { flex: 1; min-width: 0; }
+  .card-name { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .badge-pending { background: var(--amber-bg); color: var(--amber-text); font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+
+  .stage-track {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    justify-content: flex-end; flex: 2;
+  }
+  .pill {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    border: 1px solid; white-space: nowrap; font-weight: 500;
+  }
+  .pill-done { background: var(--green-bg); color: var(--green-text); border-color: #A8D5BA; }
+  .pill-active { background: var(--blue-bg); color: var(--blue-text); border-color: #9BBCEE; }
+  .pill-todo { background: var(--bg); color: var(--text-hint); border-color: var(--border); }
+
+  .chevron { font-size: 18px; color: var(--text-hint); transition: transform 0.2s; flex-shrink: 0; }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* ── Card Body ── */
+  .card-body { display: none; border-top: 1px solid var(--border); padding: 20px 18px; }
+  .card-body.open { display: block; }
+
+  .section-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-hint); margin-bottom: 10px;
+  }
+
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-hint); }
+  .field input, .field textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    transition: border-color 0.12s;
+  }
+  .field input { height: 34px; }
+  .field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--blue); background: var(--surface); box-shadow: 0 0 0 3px rgba(26,86,164,0.08); }
+
+  /* ── Stages ── */
+  .stages-wrap { margin-bottom: 20px; }
+  .stages-btns { display: flex; flex-wrap: wrap; gap: 7px; }
+  .stage-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border-mid);
+    background: var(--bg); color: var(--text-muted);
+    cursor: pointer; transition: all 0.12s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .stage-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+  .stage-btn.done { background: var(--green-bg); color: var(--green-text); border-color: #A8D5BA; }
+  .stage-btn.active { background: var(--blue-bg); color: var(--blue-text); border-color: #9BBCEE; }
+
+  /* ── Actions ── */
+  .actions-wrap { margin-bottom: 16px; }
+  .action-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .action-item:last-of-type { border-bottom: none; }
+  .action-cb { width: 16px; height: 16px; cursor: pointer; accent-color: var(--blue); flex-shrink: 0; }
+  .action-label { flex: 1; font-size: 13px; color: var(--text); }
+  .action-label.done { text-decoration: line-through; color: var(--text-hint); }
+  .action-del { background: none; border: none; cursor: pointer; color: var(--text-hint); font-size: 16px; padding: 2px; transition: color 0.1s; }
+  .action-del:hover { color: var(--red); }
+  .add-action { display: flex; gap: 8px; margin-top: 10px; }
+  .add-action input { flex: 1; height: 34px; font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 0 10px; border: 1px solid var(--border-mid); border-radius: var(--radius); background: var(--bg); color: var(--text); }
+  .add-action input:focus { outline: none; border-color: var(--blue); background: var(--surface); }
+
+  .card-footer { display: flex; justify-content: flex-end; padding-top: 14px; border-top: 1px solid var(--border); margin-top: 4px; }
+
+  /* ── Empty state ── */
+  .empty { text-align: center; padding: 4rem 1rem; color: var(--text-muted); }
+  .empty i { font-size: 40px; display: block; margin-bottom: 12px; color: var(--text-hint); }
+  .empty p { font-size: 15px; }
+
+  /* ── Modal ── */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; padding: 1rem;
+  }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    width: 480px; max-width: 100%;
+    padding: 28px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .modal-field { display: flex; flex-direction: column; gap: 5px; }
+  .modal-field.full { grid-column: 1 / -1; }
+  .modal-field label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+  .modal-field input {
+    height: 38px; padding: 0 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    border: 1px solid var(--border-mid); border-radius: var(--radius);
+    background: var(--bg); color: var(--text);
+  }
+  .modal-field input:focus { outline: none; border-color: var(--blue); background: var(--surface); box-shadow: 0 0 0 3px rgba(26,86,164,0.08); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: #1A1916; color: #fff;
+    font-size: 13px; font-weight: 500;
+    padding: 12px 20px; border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    z-index: 300; opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Progress bar ── */
+  .progress-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--blue); border-radius: 2px; transition: width 0.3s; }
+
+  @media (max-width: 700px) {
+    .main { padding: 1rem; }
+    .stage-track { display: none; }
+    .fields-grid { grid-template-columns: 1fr; }
+    .modal-grid { grid-template-columns: 1fr; }
+    .header { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">
+    <div class="brand-dot"><i class="ti ti-building-community" style="font-size:15px"></i></div>
+    <span class="brand-name">Clear<span>Gov</span> Onboarding</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i> Export to Excel</button>
+    <button class="btn btn-primary" onclick="openModal()"><i class="ti ti-plus"></i> Add Municipality</button>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="main">
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card highlight"><div class="stat-label">Total</div><div class="stat-value">2</div></div>
+    <div class="stat-card"><div class="stat-label">In progress</div><div class="stat-value">0</div></div>
+    <div class="stat-card"><div class="stat-label">Live</div><div class="stat-value">0</div></div>
+    <div class="stat-card"><div class="stat-label">Complete</div><div class="stat-value">0</div></div></div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" id="search" placeholder="Search by name or CGID…" oninput="render()">
+    </div>
+    <select id="filter-stage" onchange="render()">
+      <option value="">All stages</option>
+      <option>Kickoff call</option>
+      <option>Data collection</option>
+      <option>Mapping review call</option>
+      <option>Platform configuration</option>
+      <option>Training</option>
+      <option>Go-live</option>
+      <option>Post-launch check-in</option>
+    </select>
+    <select id="filter-csm" onchange="render()"><option value="">All reps</option><option>Alex R.</option><option>Jamie K.</option></select>
+  </div>
+
+  <div class="cards-list" id="cards-list"><div class="muni-card" id="card-1">
+      <div class="card-header" onclick="toggleCard(1)">
+        <div class="avatar" style="background:#DBEAFE;color:#1E40AF">CO</div>
+        <div class="card-meta">
+          <div class="card-name">City of Lakewood</div>
+          <div class="card-sub">
+            <span>CG-10241</span>
+            <span>·</span>
+            <span>Alex R.</span>
+            <span class="badge-pending">1 action pending</span>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="stage-track">
+          <span class="pill pill-active">Kickoff call</span><span class="pill pill-todo">Data collection</span><span class="pill pill-todo">Mapping review call</span><span class="pill pill-todo">Platform configuration</span><span class="pill pill-todo">Training</span><span class="pill pill-todo">Go-live</span><span class="pill pill-todo">Post-launch check-in</span>
+        </div>
+        <i class="ti ti-chevron-down chevron "></i>
+      </div>
+      <div class="card-body ">
+        <div class="section-label">Contact &amp; account details</div>
+        <div class="fields-grid">
+          <div class="field"><label>Contact name</label><input value="Maria Santos" onchange="upd(1,&#39;contact&#39;,this.value)" placeholder="Full name"></div>
+          <div class="field"><label>Email</label><input value="msantos@lakewood.gov" onchange="upd(1,&#39;email&#39;,this.value)" placeholder="email@city.gov"></div>
+          <div class="field"><label>ERP system</label><input value="Tyler Munis" onchange="upd(1,&#39;erp&#39;,this.value)" placeholder="e.g. Tyler Munis"></div>
+          <div class="field"><label>Products used</label><input value="Budget, Transparency" onchange="upd(1,&#39;products&#39;,this.value)" placeholder="Budget, Transparency…"></div>
+          <div class="field"><label>Start date</label><input type="date" value="2026-02-01" onchange="upd(1,&#39;start&#39;,this.value)"></div>
+          <div class="field"><label>Target go-live</label><input type="date" value="2026-06-15" onchange="upd(1,&#39;golive&#39;,this.value)"></div>
+          <div class="field full"><label>Notes / next steps</label><textarea onchange="upd(1,&#39;notes&#39;,this.value)" placeholder="Add notes…">Waiting on finance team to provide actuals.</textarea></div>
+        </div>
+
+        <div class="stages-wrap">
+          <div class="section-label">Onboarding stages — click to mark complete</div>
+          <div class="stages-btns">
+            <button class="stage-btn active" onclick="toggleStage(1,&#39;Kickoff call&#39;)">
+               Kickoff call
+            </button><button class="stage-btn " onclick="toggleStage(1,&#39;Data collection&#39;)">
+               Data collection
+            </button><button class="stage-btn " onclick="toggleStage(1,&#39;Mapping review call&#39;)">
+               Mapping review call
+            </button><button class="stage-btn " onclick="toggleStage(1,&#39;Platform configuration&#39;)">
+               Platform configuration
+            </button><button class="stage-btn " onclick="toggleStage(1,&#39;Training&#39;)">
+               Training
+            </button><button class="stage-btn " onclick="toggleStage(1,&#39;Go-live&#39;)">
+               Go-live
+            </button><button class="stage-btn " onclick="toggleStage(1,&#39;Post-launch check-in&#39;)">
+               Post-launch check-in
+            </button>
+          </div>
+        </div>
+
+        <div class="actions-wrap">
+          <div class="section-label">Action items</div>
+          <div class="action-item">
+            <input type="checkbox" class="action-cb" checked="" onchange="toggleAction(1,1,this.checked)">
+            <span class="action-label done">Send data template</span>
+            <button class="action-del" onclick="delAction(1,1)"><i class="ti ti-trash"></i></button>
+          </div><div class="action-item">
+            <input type="checkbox" class="action-cb" onchange="toggleAction(1,2,this.checked)">
+            <span class="action-label ">Schedule mapping review call</span>
+            <button class="action-del" onclick="delAction(1,2)"><i class="ti ti-trash"></i></button>
+          </div>
+          <div class="add-action">
+            <input type="text" placeholder="Add an action item…" id="ai-1" onkeydown="if(event.key===&#39;Enter&#39;)addAction(1)">
+            <button class="btn btn-sm" onclick="addAction(1)"><i class="ti ti-plus"></i> Add</button>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-sm btn-danger" onclick="delMuni(1)"><i class="ti ti-trash"></i> Remove municipality</button>
+        </div>
+      </div>
+    </div><div class="muni-card" id="card-2">
+      <div class="card-header" onclick="toggleCard(2)">
+        <div class="avatar" style="background:#D1FAE5;color:#065F46">TO</div>
+        <div class="card-meta">
+          <div class="card-name">Township of Maplewood</div>
+          <div class="card-sub">
+            <span>CG-10255</span>
+            <span>·</span>
+            <span>Jamie K.</span>
+            <span class="badge-pending">1 action pending</span>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="stage-track">
+          <span class="pill pill-active">Kickoff call</span><span class="pill pill-todo">Data collection</span><span class="pill pill-todo">Mapping review call</span><span class="pill pill-todo">Platform configuration</span><span class="pill pill-todo">Training</span><span class="pill pill-todo">Go-live</span><span class="pill pill-todo">Post-launch check-in</span>
+        </div>
+        <i class="ti ti-chevron-down chevron "></i>
+      </div>
+      <div class="card-body ">
+        <div class="section-label">Contact &amp; account details</div>
+        <div class="fields-grid">
+          <div class="field"><label>Contact name</label><input value="Derek Hill" onchange="upd(2,&#39;contact&#39;,this.value)" placeholder="Full name"></div>
+          <div class="field"><label>Email</label><input value="dhill@maplewood.gov" onchange="upd(2,&#39;email&#39;,this.value)" placeholder="email@city.gov"></div>
+          <div class="field"><label>ERP system</label><input value="Caselle" onchange="upd(2,&#39;erp&#39;,this.value)" placeholder="e.g. Tyler Munis"></div>
+          <div class="field"><label>Products used</label><input value="Capital Planning" onchange="upd(2,&#39;products&#39;,this.value)" placeholder="Budget, Transparency…"></div>
+          <div class="field"><label>Start date</label><input type="date" value="2026-03-10" onchange="upd(2,&#39;start&#39;,this.value)"></div>
+          <div class="field"><label>Target go-live</label><input type="date" value="2026-07-01" onchange="upd(2,&#39;golive&#39;,this.value)"></div>
+          <div class="field full"><label>Notes / next steps</label><textarea onchange="upd(2,&#39;notes&#39;,this.value)" placeholder="Add notes…">Small team — schedule training around council meetings.</textarea></div>
+        </div>
+
+        <div class="stages-wrap">
+          <div class="section-label">Onboarding stages — click to mark complete</div>
+          <div class="stages-btns">
+            <button class="stage-btn active" onclick="toggleStage(2,&#39;Kickoff call&#39;)">
+               Kickoff call
+            </button><button class="stage-btn " onclick="toggleStage(2,&#39;Data collection&#39;)">
+               Data collection
+            </button><button class="stage-btn " onclick="toggleStage(2,&#39;Mapping review call&#39;)">
+               Mapping review call
+            </button><button class="stage-btn " onclick="toggleStage(2,&#39;Platform configuration&#39;)">
+               Platform configuration
+            </button><button class="stage-btn " onclick="toggleStage(2,&#39;Training&#39;)">
+               Training
+            </button><button class="stage-btn " onclick="toggleStage(2,&#39;Go-live&#39;)">
+               Go-live
+            </button><button class="stage-btn " onclick="toggleStage(2,&#39;Post-launch check-in&#39;)">
+               Post-launch check-in
+            </button>
+          </div>
+        </div>
+
+        <div class="actions-wrap">
+          <div class="section-label">Action items</div>
+          <div class="action-item">
+            <input type="checkbox" class="action-cb" onchange="toggleAction(2,1,this.checked)">
+            <span class="action-label ">Confirm ERP export format</span>
+            <button class="action-del" onclick="delAction(2,1)"><i class="ti ti-trash"></i></button>
+          </div>
+          <div class="add-action">
+            <input type="text" placeholder="Add an action item…" id="ai-2" onkeydown="if(event.key===&#39;Enter&#39;)addAction(2)">
+            <button class="btn btn-sm" onclick="addAction(2)"><i class="ti ti-plus"></i> Add</button>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-sm btn-danger" onclick="delMuni(2)"><i class="ti ti-trash"></i> Remove municipality</button>
+        </div>
+      </div>
+    </div></div>
+</main>
+
+<!-- Add Modal -->
+<div class="modal-backdrop" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Add Municipality</div>
+    <div class="modal-grid">
+      <div class="modal-field full"><label>Municipality name *</label><input id="m-name" placeholder="City of Springfield" type="text"></div>
+      <div class="modal-field full"><label>CGID</label><input id="m-cgid" placeholder="CG-00000" type="text"></div>
+      <div class="modal-field"><label>Contact name</label><input id="m-contact" placeholder="Jane Doe" type="text"></div>
+      <div class="modal-field"><label>Contact email</label><input id="m-email" placeholder="jane@city.gov" type="text"></div>
+      <div class="modal-field"><label>Assigned CSM / rep</label><input id="m-csm" placeholder="Your name" type="text"></div>
+      <div class="modal-field"><label>ERP system</label><input id="m-erp" placeholder="e.g. Tyler Munis" type="text"></div>
+      <div class="modal-field full"><label>Products used</label><input id="m-products" placeholder="e.g. Budget, Transparency, Capital" type="text"></div>
+      <div class="modal-field"><label>Start date</label><input id="m-start" type="date"></div>
+      <div class="modal-field"><label>Target go-live date</label><input id="m-golive" type="date"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNew()"><i class="ti ti-plus"></i> Add Municipality</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STAGES = ["Kickoff call","Data collection","Mapping review call","Platform configuration","Training","Go-live","Post-launch check-in"];
+const AVATAR_COLORS = [
+  ["#DBEAFE","#1E40AF"],["#D1FAE5","#065F46"],["#EDE9FE","#4C1D95"],
+  ["#FEF3C7","#92400E"],["#FCE7F3","#9D174D"],["#DCFCE7","#14532D"],["#FEE2E2","#991B1B"]
+];
+
+let data = JSON.parse(localStorage.getItem("cg_onboarding") || "null") || {
+  munis: [
+    {id:1,name:"City of Lakewood",cgid:"CG-10241",contact:"Maria Santos",email:"msantos@lakewood.gov",csm:"Alex R.",erp:"Tyler Munis",products:"Budget, Transparency",start:"2026-02-01",golive:"2026-06-15",stages:{},actions:[{id:1,text:"Send data template",done:true},{id:2,text:"Schedule mapping review call",done:false}],notes:"Waiting on finance team to provide actuals."},
+    {id:2,name:"Township of Maplewood",cgid:"CG-10255",contact:"Derek Hill",email:"dhill@maplewood.gov",csm:"Jamie K.",erp:"Caselle",products:"Capital Planning",start:"2026-03-10",golive:"2026-07-01",stages:{},actions:[{id:1,text:"Confirm ERP export format",done:false}],notes:"Small team — schedule training around council meetings."}
+  ],
+  nextId: 3
+};
+
+function save() { localStorage.setItem("cg_onboarding", JSON.stringify(data)); }
+
+function getLastDone(m) {
+  let l = -1;
+  STAGES.forEach((s,i) => { if(m.stages[s]==="done") l = i; });
+  return l;
+}
+
+function getStatus(m) {
+  if(m.stages["Post-launch check-in"]==="done") return "Complete";
+  if(m.stages["Go-live"]==="done") return "Live";
+  if(getLastDone(m) >= 0) return "In progress";
+  return "Not started";
+}
+
+function pillCls(m,s,i) {
+  if(m.stages[s]==="done") return "pill-done";
+  if(i === getLastDone(m)+1) return "pill-active";
+  return "pill-todo";
+}
+
+function stageBtnCls(m,s) {
+  if(m.stages[s]==="done") return "done";
+  if(STAGES.indexOf(s) === getLastDone(m)+1) return "active";
+  return "";
+}
+
+function initials(n) { return n.split(" ").map(w=>w[0]).join("").substring(0,2).toUpperCase(); }
+function avatarStyle(i) {
+  const c = AVATAR_COLORS[i % AVATAR_COLORS.length];
+  return `background:${c[0]};color:${c[1]}`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+function render() {
+  const q = (document.getElementById("search").value||"").toLowerCase();
+  const fs = document.getElementById("filter-stage").value;
+  const fc = document.getElementById("filter-csm").value;
+
+  // Refresh CSM filter
+  const csms = [...new Set(data.munis.map(m=>m.csm).filter(Boolean))];
+  const sel = document.getElementById("filter-csm");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All reps</option>' + csms.map(c=>`<option${c===cur?" selected":""}>${c}</option>`).join("");
+
+  // Stats
+  const total = data.munis.length;
+  const live = data.munis.filter(m=>m.stages["Go-live"]==="done").length;
+  const inProg = data.munis.filter(m=>getLastDone(m)>=0&&!m.stages["Go-live"]).length;
+  const complete = data.munis.filter(m=>m.stages["Post-launch check-in"]==="done").length;
+  document.getElementById("stats-row").innerHTML = `
+    <div class="stat-card highlight"><div class="stat-label">Total</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">In progress</div><div class="stat-value">${inProg}</div></div>
+    <div class="stat-card"><div class="stat-label">Live</div><div class="stat-value">${live}</div></div>
+    <div class="stat-card"><div class="stat-label">Complete</div><div class="stat-value">${complete}</div></div>`;
+
+  // Filter
+  let munis = data.munis.filter(m => {
+    if(q && !m.name.toLowerCase().includes(q) && !(m.cgid||"").toLowerCase().includes(q)) return false;
+    if(fs) { const i=STAGES.indexOf(fs); const l=getLastDone(m); if(!(m.stages[fs]==="done"||(i===l+1))) return false; }
+    if(fc && m.csm!==fc) return false;
+    return true;
+  });
+
+  const container = document.getElementById("cards-list");
+  if(!munis.length) {
+    container.innerHTML = `<div class="empty"><i class="ti ti-building"></i><p>No municipalities found</p></div>`;
+    return;
+  }
+
+  container.innerHTML = munis.map(m => {
+    const ci = data.munis.indexOf(m);
+    const open = m._open ? "open" : "";
+    const pending = m.actions.filter(a=>!a.done).length;
+    const done = STAGES.filter(s=>m.stages[s]==="done").length;
+    const pct = Math.round((done/STAGES.length)*100);
+    return `<div class="muni-card" id="card-${m.id}">
+      <div class="card-header" onclick="toggleCard(${m.id})">
+        <div class="avatar" style="${avatarStyle(ci)}">${initials(m.name)}</div>
+        <div class="card-meta">
+          <div class="card-name">${m.name}</div>
+          <div class="card-sub">
+            <span>${m.cgid||"No CGID"}</span>
+            <span>·</span>
+            <span>${m.csm||"Unassigned"}</span>
+            ${pending ? `<span class="badge-pending">${pending} action${pending>1?"s":""} pending</span>` : ""}
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="stage-track">
+          ${STAGES.map((s,i)=>`<span class="pill ${pillCls(m,s,i)}">${s}</span>`).join("")}
+        </div>
+        <i class="ti ti-chevron-down chevron ${open}"></i>
+      </div>
+      <div class="card-body ${open}">
+        <div class="section-label">Contact & account details</div>
+        <div class="fields-grid">
+          <div class="field"><label>Contact name</label><input value="${m.contact||""}" onchange="upd(${m.id},'contact',this.value)" placeholder="Full name"></div>
+          <div class="field"><label>Email</label><input value="${m.email||""}" onchange="upd(${m.id},'email',this.value)" placeholder="email@city.gov"></div>
+          <div class="field"><label>ERP system</label><input value="${m.erp||""}" onchange="upd(${m.id},'erp',this.value)" placeholder="e.g. Tyler Munis"></div>
+          <div class="field"><label>Products used</label><input value="${m.products||""}" onchange="upd(${m.id},'products',this.value)" placeholder="Budget, Transparency…"></div>
+          <div class="field"><label>Start date</label><input type="date" value="${m.start||""}" onchange="upd(${m.id},'start',this.value)"></div>
+          <div class="field"><label>Target go-live</label><input type="date" value="${m.golive||""}" onchange="upd(${m.id},'golive',this.value)"></div>
+          <div class="field full"><label>Notes / next steps</label><textarea onchange="upd(${m.id},'notes',this.value)" placeholder="Add notes…">${m.notes||""}</textarea></div>
+        </div>
+
+        <div class="stages-wrap">
+          <div class="section-label">Onboarding stages — click to mark complete</div>
+          <div class="stages-btns">
+            ${STAGES.map(s=>`<button class="stage-btn ${stageBtnCls(m,s)}" onclick="toggleStage(${m.id},'${s}')">
+              ${m.stages[s]==="done"?'<i class="ti ti-check" style="font-size:12px"></i>':""} ${s}
+            </button>`).join("")}
+          </div>
+        </div>
+
+        <div class="actions-wrap">
+          <div class="section-label">Action items</div>
+          ${m.actions.map(a=>`<div class="action-item">
+            <input type="checkbox" class="action-cb" ${a.done?"checked":""} onchange="toggleAction(${m.id},${a.id},this.checked)">
+            <span class="action-label ${a.done?"done":""}">${a.text}</span>
+            <button class="action-del" onclick="delAction(${m.id},${a.id})"><i class="ti ti-trash"></i></button>
+          </div>`).join("")}
+          <div class="add-action">
+            <input type="text" placeholder="Add an action item…" id="ai-${m.id}" onkeydown="if(event.key==='Enter')addAction(${m.id})">
+            <button class="btn btn-sm" onclick="addAction(${m.id})"><i class="ti ti-plus"></i> Add</button>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-sm btn-danger" onclick="delMuni(${m.id})"><i class="ti ti-trash"></i> Remove municipality</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function toggleCard(id) { const m=data.munis.find(x=>x.id===id); m._open=!m._open; render(); }
+function upd(id,f,v) { const m=data.munis.find(x=>x.id===id); m[f]=v; save(); }
+function toggleStage(id,s) { const m=data.munis.find(x=>x.id===id); m.stages[s]=m.stages[s]==="done"?"":"done"; save(); render(); }
+function toggleAction(id,aid,done) { const m=data.munis.find(x=>x.id===id); m.actions.find(x=>x.id===aid).done=done; save(); render(); }
+function delAction(id,aid) { const m=data.munis.find(x=>x.id===id); m.actions=m.actions.filter(x=>x.id!==aid); save(); render(); }
+function addAction(id) {
+  const inp=document.getElementById("ai-"+id); const txt=inp.value.trim(); if(!txt) return;
+  const m=data.munis.find(x=>x.id===id); m.actions.push({id:Date.now(),text:txt,done:false});
+  save(); render(); data.munis.find(x=>x.id===id)._open=true; render();
+}
+function delMuni(id) { if(!confirm("Remove this municipality from the tracker?")) return; data.munis=data.munis.filter(x=>x.id!==id); save(); render(); }
+function openModal() { document.getElementById("modal").style.display="flex"; }
+function closeModal() { document.getElementById("modal").style.display="none"; }
+function saveNew() {
+  const name=document.getElementById("m-name").value.trim();
+  if(!name){alert("Please enter a municipality name.");return;}
+  data.munis.push({id:data.nextId++,name,cgid:document.getElementById("m-cgid").value.trim(),contact:document.getElementById("m-contact").value.trim(),email:document.getElementById("m-email").value.trim(),csm:document.getElementById("m-csm").value.trim(),erp:document.getElementById("m-erp").value.trim(),products:document.getElementById("m-products").value.trim(),start:document.getElementById("m-start").value,golive:document.getElementById("m-golive").value,stages:{},actions:[],notes:"",_open:true});
+  save(); closeModal(); render(); showToast("Municipality added!");
+  ["m-name","m-cgid","m-contact","m-email","m-csm","m-erp","m-products","m-start","m-golive"].forEach(id=>{document.getElementById(id).value="";});
+}
+
+function exportExcel() {
+  const wb = XLSX.utils.book_new();
+  const s1 = [["Municipality","CGID","Contact","Email","CSM","ERP","Products","Start","Go-Live",...STAGES,"Stages Done","Status","Pending Actions","Notes"]];
+  data.munis.forEach(m=>{
+    const done=STAGES.filter(s=>m.stages[s]==="done").length;
+    s1.push([m.name,m.cgid,m.contact,m.email,m.csm,m.erp,m.products,m.start||"",m.golive||"",...STAGES.map(s=>m.stages[s]==="done"?"✓":""),done+"/"+STAGES.length,getStatus(m),m.actions.filter(a=>!a.done).map(a=>a.text).join("; "),m.notes||""]);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(s1);
+  ws["!cols"]=[{wch:26},{wch:12},{wch:20},{wch:26},{wch:14},{wch:16},{wch:22},{wch:12},{wch:14},...STAGES.map(()=>({wch:9})),{wch:12},{wch:16},{wch:30},{wch:38}];
+  XLSX.utils.book_append_sheet(wb,ws,"Summary");
+
+  const s2=[["Municipality","CGID","Action Item","Status","CSM"]];
+  data.munis.forEach(m=>m.actions.forEach(a=>s2.push([m.name,m.cgid,a.text,a.done?"Complete":"Pending",m.csm])));
+  const ws2=XLSX.utils.aoa_to_sheet(s2); ws2["!cols"]=[{wch:26},{wch:12},{wch:40},{wch:12},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws2,"Action Items");
+
+  const s3=[["Municipality","CGID","Stage","Status","CSM"]];
+  data.munis.forEach(m=>{const l=getLastDone(m);STAGES.forEach((s,i)=>{let st="Not started";if(m.stages[s]==="done")st="Complete";else if(i===l+1)st="In progress";s3.push([m.name,m.cgid,s,st,m.csm]);});});
+  const ws3=XLSX.utils.aoa_to_sheet(s3); ws3["!cols"]=[{wch:26},{wch:12},{wch:24},{wch:14},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws3,"Stage Progress");
+
+  XLSX.writeFile(wb,`ClearGov_Onboarding_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast("Excel file downloaded!");
+}
+
+render();
+</script>
+
+
+</body></html>
