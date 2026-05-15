@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)file:///C:/Users/mbauman/Downloads/mmmm-bot-unified.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mmmm-Bot Workspace</title>
+<link href="./index_files/css2" rel="stylesheet">
+<link rel="stylesheet" href="./index_files/tabler-icons.min.css">
+<script src="./index_files/xlsx.full.min.js.download"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#090c12;--bg2:#111520;--bg3:#181d28;--bg4:#1f2535;--bg5:#262d3e;
+  --border:#252d40;--border2:#2e384f;
+  --accent:#4ab0ff;--accent-dim:rgba(74,176,255,0.12);
+  --red:#e74c3c;--red-dim:rgba(231,76,60,0.12);
+  --green:#27ae60;--green-dim:rgba(39,174,96,0.12);
+  --amber:#f39c12;--amber-dim:rgba(243,156,18,0.12);
+  --purple:#9b59b6;
+  --text:#dde2f0;--text2:#7a8299;--text3:#3f4a62;
+  --font:'DM Sans',sans-serif;--mono:'Space Mono',monospace;
+  --r:8px;--r2:12px;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;min-height:48px}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-name{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.06em}
+.logo-sub{font-size:10px;color:var(--text3);letter-spacing:0.04em}
+.topbar-nav{display:flex;gap:2px;margin-left:24px}
+.nav-tab{padding:5px 14px;border-radius:6px;font-size:12px;font-family:var(--mono);cursor:pointer;color:var(--text2);border:none;background:transparent;transition:all 0.15s;letter-spacing:0.04em}
+.nav-tab:hover{color:var(--text);background:var(--bg3)}
+.nav-tab.active{color:var(--accent);background:var(--accent-dim)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.status-pill{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;background:var(--green-dim);border:1px solid rgba(39,174,96,0.25);font-size:11px;color:var(--green)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* ── LAYOUT ── */
+.view{display:none;flex:1;overflow:hidden}
+.view.active{display:flex}
+
+/* ══════════════════════════════════════════
+   TRACKER VIEW
+══════════════════════════════════════════ */
+.tracker-layout{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tracker-toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.t-search{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 12px;color:var(--text);font-family:var(--font);font-size:13px;width:200px;outline:none}
+.t-search:focus{border-color:var(--accent)}
+.t-search::placeholder{color:var(--text3)}
+select.t-select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 10px;color:var(--text2);font-size:12px;outline:none;cursor:pointer;font-family:var(--mono)}
+select.t-select:focus{border-color:var(--accent);color:var(--text)}
+.csm-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.csm-tab{padding:5px 12px;border-radius:20px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;transition:all 0.15s}
+.csm-tab:hover{border-color:var(--accent);color:var(--accent)}
+.csm-tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.toolbar-right{margin-left:auto;display:flex;gap:6px}
+.btn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r);font-size:12px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all 0.15s;letter-spacing:0.03em}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.btn-primary:hover{background:#6ec4ff;color:#000}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-green:hover{background:#2ecc71;border-color:#2ecc71;color:#fff}
+
+/* Summary bar */
+.summary-bar{display:flex;gap:10px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.sum-card{padding:6px 14px;border-radius:var(--r);background:var(--bg3);border:1px solid var(--border);display:flex;flex-direction:column;gap:2px;min-width:90px}
+.sum-label{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:0.06em}
+.sum-val{font-size:18px;font-weight:600;font-family:var(--mono);color:var(--text)}
+.sum-card.s-live .sum-val{color:var(--green)}
+.sum-card.s-prog .sum-val{color:var(--accent)}
+.sum-card.s-stuck .sum-val{color:var(--amber)}
+
+/* Cards grid */
+.cards-area{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.muni-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:border-color 0.15s}
+.muni-card:hover{border-color:var(--border2)}
+.muni-card.expanded{border-color:var(--accent)}
+
+/* Card header */
+.card-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none}
+.card-avatar{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0}
+.card-main{flex:1;min-width:0}
+.card-name{font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap}
+.card-cgid{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.card-csm{font-size:11px;color:var(--text2)}
+.stage-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-family:var(--mono);border:1px solid;font-weight:700}
+.stage-badge.done{background:var(--green-dim);color:var(--green);border-color:rgba(39,174,96,0.3)}
+.stage-badge.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(74,176,255,0.3)}
+.stage-badge.stuck{background:var(--amber-dim);color:var(--amber);border-color:rgba(243,156,18,0.3)}
+.stage-badge.notstarted{background:var(--bg3);color:var(--text3);border-color:var(--border)}
+.card-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.product-pills{display:flex;gap:3px;flex-wrap:wrap}
+.ppill{padding:1px 6px;border-radius:4px;font-size:9px;font-family:var(--mono);background:var(--bg4);border:1px solid var(--border);color:var(--text2)}
+.star-row{display:flex;gap:1px}
+.star{font-size:12px;cursor:pointer;color:var(--text3);transition:color 0.1s}
+.star.on{color:var(--amber)}
+.chevron{font-size:14px;color:var(--text3);transition:transform 0.2s}
+.muni-card.expanded .chevron{transform:rotate(180deg)}
+
+/* Card body */
+.card-body{display:none;border-top:1px solid var(--border);padding:0}
+.muni-card.expanded .card-body{display:block}
+.card-tabs{display:flex;border-bottom:1px solid var(--border)}
+.card-tab{padding:8px 16px;font-size:11px;font-family:var(--mono);cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all 0.15s;letter-spacing:0.04em}
+.card-tab:hover{color:var(--text)}
+.card-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.card-section{display:none;padding:14px 16px}
+.card-section.active{display:block}
+
+/* Fields grid */
+.fields-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.field-group{display:flex;flex-direction:column;gap:4px}
+.field-group.full{grid-column:1/-1}
+.field-group.two{grid-column:span 2}
+.field-label{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:0.06em;text-transform:uppercase}
+.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border-color 0.15s}
+.field-input:focus{border-color:var(--accent)}
+.field-input::placeholder{color:var(--text3)}
+textarea.field-input{resize:vertical;min-height:70px;line-height:1.6}
+select.field-input{cursor:pointer}
+
+/* Contacts */
+.contacts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.contact-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px}
+.contact-label{font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:6px;letter-spacing:0.06em}
+.contact-stars{display:flex;gap:2px;margin-top:6px}
+
+/* Stages */
+.stages-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.stage-btn{padding:6px 12px;border-radius:20px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text3);transition:all 0.15s;display:flex;align-items:center;gap:4px}
+.stage-btn:hover{border-color:var(--text2);color:var(--text2)}
+.stage-btn.done{background:var(--green-dim);border-color:rgba(39,174,96,0.4);color:var(--green)}
+.stage-btn.current{background:var(--accent-dim);border-color:rgba(74,176,255,0.4);color:var(--accent);font-weight:700}
+.stage-arrow{color:var(--text3);font-size:12px}
+
+/* Checklist */
+.checklist{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.check-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;transition:background 0.1s}
+.check-item:hover{background:var(--bg3)}
+.check-box{width:16px;height:16px;border-radius:4px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;font-size:10px}
+.check-box.checked{background:var(--green);border-color:var(--green);color:#fff}
+.check-text{font-size:13px;color:var(--text2)}
+.check-text.checked{text-decoration:line-through;color:var(--text3)}
+
+/* Actions */
+.actions-list{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.action-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)}
+.action-cb{width:16px;height:16px;border-radius:4px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.15s;font-size:10px}
+.action-cb.done{background:var(--green);border-color:var(--green);color:#fff}
+.action-text{flex:1;font-size:13px;color:var(--text2)}
+.action-text.done{text-decoration:line-through;color:var(--text3)}
+.action-del{color:var(--text3);cursor:pointer;font-size:12px;transition:color 0.1s;background:none;border:none}
+.action-del:hover{color:var(--red)}
+.add-action-row{display:flex;gap:6px}
+.add-action-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;outline:none;font-family:var(--font)}
+.add-action-input:focus{border-color:var(--accent)}
+.add-action-input::placeholder{color:var(--text3)}
+
+/* Products toggle */
+.products-wrap{display:flex;gap:6px;flex-wrap:wrap}
+.product-toggle{padding:5px 12px;border-radius:6px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text3);transition:all 0.15s}
+.product-toggle.on{background:var(--accent-dim);border-color:rgba(74,176,255,0.4);color:var(--accent);font-weight:700}
+
+/* Dates row */
+.dates-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.date-block{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px}
+.date-label{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:0.06em;margin-bottom:4px}
+.date-val{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.date-notes{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.4}
+
+/* Card danger zone */
+.danger-btn{padding:5px 12px;border-radius:6px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid rgba(231,76,60,0.3);background:transparent;color:var(--red);transition:all 0.15s}
+.danger-btn:hover{background:var(--red);color:#fff}
+
+/* ══════════════════════════════════════════
+   NOTES VIEW
+══════════════════════════════════════════ */
+.notes-layout{flex:1;display:flex;overflow:hidden}
+.notes-sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.ns-section{padding:10px 12px 4px;font-size:9px;font-family:var(--mono);color:var(--text3);letter-spacing:0.14em;text-transform:uppercase}
+.ns-project{display:flex;align-items:center;gap:7px;padding:7px 12px;cursor:pointer;font-size:12px;color:var(--text2);transition:all 0.15s;border-left:2px solid transparent}
+.ns-project:hover{background:var(--bg3);color:var(--text)}
+.ns-project.active{background:var(--bg3);color:var(--accent);border-left-color:var(--accent)}
+.ns-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.ns-project.active .ns-dot{background:var(--accent)}
+.ns-add{display:flex;align-items:center;gap:7px;padding:7px 12px;cursor:pointer;font-size:11px;color:var(--text3);transition:all 0.15s}
+.ns-add:hover{color:var(--accent)}
+.ns-bottom{margin-top:auto;padding:10px 12px;border-top:1px solid var(--border);font-size:10px;color:var(--text3)}
+
+.notes-list-panel{width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.nlp-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.nlp-title{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.08em}
+.icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.notes-list{flex:1;overflow-y:auto;padding:6px}
+.note-card{padding:9px 11px;border-radius:var(--r);border:1px solid var(--border);margin-bottom:5px;cursor:pointer;transition:all 0.15s;background:var(--bg3)}
+.note-card:hover{border-color:var(--border2);transform:translateX(2px)}
+.note-card.active{border-color:var(--accent);background:var(--bg4)}
+.nc-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc-preview{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc-meta{display:flex;align-items:center;gap:5px;margin-top:4px}
+.nc-tag{font-size:9px;padding:1px 5px;border-radius:3px;font-family:var(--mono)}
+.tag-audio{background:#1a3a1a;color:#4caf50;border:1px solid #2a5a2a}
+.tag-task{background:#1a1a3a;color:#7a7aff;border:1px solid #2a2a5a}
+.nc-date{font-size:10px;color:var(--text3);margin-left:auto}
+
+.editor-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.editor-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:8px}
+.editor-empty p{font-size:12px;font-family:var(--mono)}
+.editor-toolbar{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.note-title-inp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:14px;font-weight:700;outline:none;min-width:0}
+.note-title-inp::placeholder{color:var(--text3)}
+.toolbar-btns{display:flex;gap:5px;margin-left:auto}
+.sm-btn{padding:4px 10px;border-radius:6px;font-size:10px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all 0.15s;letter-spacing:0.03em}
+.sm-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sm-btn.primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.sm-btn.danger{color:var(--red);border-color:rgba(231,76,60,0.3)}
+.sm-btn.danger:hover{background:var(--red);color:#fff}
+.note-textarea{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:13px;line-height:1.8;padding:16px;resize:none;outline:none}
+.note-textarea::placeholder{color:var(--text3)}
+
+/* Tasks panel */
+.tasks-panel{border-top:1px solid var(--border);padding:10px 14px;background:var(--bg2)}
+.tasks-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.tasks-title{font-size:10px;font-family:var(--mono);color:var(--text2);letter-spacing:0.08em}
+.task-row{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border)}
+.task-cb{width:14px;height:14px;border-radius:3px;border:1px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all 0.15s}
+.task-cb.done{background:var(--green);border-color:var(--green);color:#fff}
+.task-text.done{text-decoration:line-through;color:var(--text3)}
+
+/* Audio panel */
+.audio-panel{border-top:1px solid var(--border);padding:12px 14px;background:var(--bg2)}
+.audio-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.audio-title{font-size:10px;font-family:var(--mono);color:var(--text2);letter-spacing:0.08em}
+.audio-btns{display:flex;gap:6px}
+.rec-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:16px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid rgba(231,76,60,0.4);color:var(--red);background:transparent;transition:all 0.2s}
+.rec-btn:hover,.rec-btn.recording{background:var(--red);color:#fff}
+.rec-btn.recording{animation:pulseRed 1s infinite}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 6px rgba(231,76,60,0)}}
+.upload-lbl{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:16px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;transition:all 0.2s}
+.upload-lbl:hover{border-color:var(--accent);color:var(--accent)}
+.rec-bar{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--red-dim);border-radius:6px;border:1px solid rgba(231,76,60,0.3);margin-bottom:8px}
+.rec-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulseRed 1s infinite;flex-shrink:0}
+.rec-timer{font-family:var(--mono);font-size:11px;color:var(--red);margin-left:auto}
+.clip-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);margin-bottom:5px}
+.clip-info{flex:1;min-width:0}
+.clip-name{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clip-dur{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.clip-tr-btn{font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--mono);transition:all 0.15s;white-space:nowrap}
+.clip-tr-btn:hover{border-color:var(--green);color:var(--green)}
+audio{width:100%;height:24px;margin-top:3px}
+
+/* ══════════════════════════════════════════
+   CHAT PANEL (shared right column)
+══════════════════════════════════════════ */
+.chat-panel{width:300px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.chat-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.chat-bot-name{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;letter-spacing:0.06em}
+.chat-bot-sub{font-size:10px;color:var(--text3)}
+.chat-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:88%;display:flex;flex-direction:column;gap:2px}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.msg-bubble{padding:8px 12px;border-radius:10px;font-size:12px;line-height:1.6}
+.msg.bot .msg-bubble{background:var(--bg3);border:1px solid var(--border);border-bottom-left-radius:2px;color:var(--text)}
+.msg.user .msg-bubble{background:var(--accent);color:#000;border-bottom-right-radius:2px;font-weight:500}
+.msg-time{font-size:9px;color:var(--text3);font-family:var(--mono)}
+.msg.user .msg-time{text-align:right}
+.typing-ind{display:flex;gap:3px;align-items:center;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;border-bottom-left-radius:2px;width:fit-content}
+.t-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:tdot 1.4s infinite}
+.t-dot:nth-child(2){animation-delay:0.2s}
+.t-dot:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-5px);opacity:1}}
+.chat-chips{padding:7px 10px;display:flex;flex-wrap:wrap;gap:4px;border-top:1px solid var(--border)}
+.chip{padding:3px 9px;border-radius:12px;font-size:10px;border:1px solid var(--border);color:var(--text2);background:transparent;cursor:pointer;transition:all 0.15s;font-family:var(--mono)}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.chat-input-row{padding:8px 10px;border-top:1px solid var(--border);display:flex;gap:6px;align-items:flex-end}
+.chat-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:var(--font);font-size:12px;resize:none;outline:none;line-height:1.5;max-height:90px;min-height:32px}
+.chat-inp:focus{border-color:var(--accent)}
+.chat-inp::placeholder{color:var(--text3)}
+.send-btn{width:32px;height:32px;border-radius:7px;background:var(--accent);border:none;cursor:pointer;color:#000;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s}
+.send-btn:hover{background:#6ec4ff;transform:scale(1.05)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:22px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:translateY(8px);transition:transform 0.2s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-title{font-family:var(--mono);font-size:13px;color:var(--accent);margin-bottom:16px;letter-spacing:0.06em}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg3);border:1px solid var(--green);color:var(--green);padding:8px 18px;border-radius:20px;font-size:12px;font-family:var(--mono);opacity:0;transition:all 0.3s;z-index:300;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+.hidden{display:none!important}
+.empty-hint{font-size:11px;color:var(--text3);font-family:var(--mono);padding:16px 0;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo-wrap">
+    <!-- Mmmm-Bot mini avatar -->
+    <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+      <rect width="36" height="36" rx="8" fill="#111520"></rect>
+      <ellipse cx="18" cy="10" rx="9" ry="6" fill="#c0392b"></ellipse>
+      <ellipse cx="21" cy="8" rx="6" ry="4" fill="#c0392b"></ellipse>
+      <rect x="9" y="13" width="18" height="3" rx="1.5" fill="#a93226"></rect>
+      <circle cx="21" cy="5" r="2" fill="#e74c3c"></circle>
+      <ellipse cx="7" cy="20" rx="3" ry="4" fill="#222" stroke="#444" stroke-width="0.5"></ellipse>
+      <ellipse cx="29" cy="20" rx="3" ry="4" fill="#222" stroke="#444" stroke-width="0.5"></ellipse>
+      <path d="M7 17 Q18 11 29 17" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"></path>
+      <rect x="10" y="17" width="16" height="13" rx="3" fill="#050d1a" stroke="#1a3a6a" stroke-width="0.5"></rect>
+      <ellipse cx="14.5" cy="22" rx="2.5" ry="2" fill="#4ab0ff"></ellipse>
+      <ellipse cx="21.5" cy="22" rx="2.5" ry="2" fill="#4ab0ff"></ellipse>
+      <path d="M14 26.5 Q18 28.5 22 26.5" fill="none" stroke="#4ab0ff" stroke-width="0.8" stroke-linecap="round"></path>
+    </svg>
+    <div>
+      <div class="logo-name">MMMM-BOT</div>
+      <div class="logo-sub">UNIFIED WORKSPACE</div>
+    </div>
+  </div>
+  <nav class="topbar-nav">
+    <button class="nav-tab active" onclick="switchView(&#39;tracker&#39;)">📋 Municipality Tracker</button>
+    <button class="nav-tab" onclick="switchView(&#39;notes&#39;)">📝 Notes &amp; Audio</button>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill"><div class="status-dot"></div>AI Ready</div>
+  </div>
+</div>
+
+<!-- ══════ TRACKER VIEW ══════ -->
+<div class="view active" id="view-tracker" style="flex-direction:column">
+  <div class="tracker-layout">
+
+    <div class="tracker-toolbar">
+      <input class="t-search" id="t-search" placeholder="Search municipalities…" oninput="renderTracker()">
+      <select class="t-select" id="t-stage" onchange="renderTracker()">
+        <option value="">All stages</option>
+        <option>Kickoff call</option>
+        <option>Data collection</option>
+        <option>Platform configuration</option>
+        <option>Mapping review call</option>
+        <option>Data Launch</option>
+        <option>2 Week Close</option>
+      </select>
+      <div class="csm-tabs" id="csm-tabs">
+    <button class="csm-tab active" onclick="setCsm(&#39;All&#39;)">All</button>
+    <button class="csm-tab " onclick="setCsm(&#39;Michelle&#39;)">Michelle</button></div>
+      <div class="toolbar-right">
+        <button class="btn btn-green" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i> Export Excel</button>
+        <button class="btn btn-primary" onclick="openAddModal()"><i class="ti ti-plus"></i> Add Municipality</button>
+      </div>
+    </div>
+
+    <div class="summary-bar" id="summary-bar">
+    <div class="sum-card"><div class="sum-label">TOTAL</div><div class="sum-val">1</div></div>
+    <div class="sum-card s-prog"><div class="sum-label">IN PROGRESS</div><div class="sum-val">0</div></div>
+    <div class="sum-card s-live"><div class="sum-label">LAUNCHED</div><div class="sum-val">0</div></div>
+    <div class="sum-card s-stuck"><div class="sum-label">ATTENTION</div><div class="sum-val">0</div></div></div>
+
+    <div style="display:flex;flex:1;overflow:hidden">
+      <div class="cards-area" id="cards-area" style="flex:1">
+  <div class="muni-card " id="card-1">
+    <div class="card-head" onclick="toggleCard(1)">
+      <div class="card-avatar" style="background:#1a3a1a;color:#4caf50">CO</div>
+      <div class="card-main">
+        <div class="card-name">City of Lakewood</div>
+        <div class="card-meta">
+          <span class="card-cgid">CG-10241</span>
+          <span class="card-csm">Michelle</span>
+          <span class="stage-badge notstarted">Not started</span>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="product-pills"><span class="ppill">OB</span><span class="ppill">TR</span></div>
+        <div class="star-row"><span class="star on" onclick="event.stopPropagation();setDataStars(1,1)">★</span><span class="star on" onclick="event.stopPropagation();setDataStars(1,2)">★</span><span class="star " onclick="event.stopPropagation();setDataStars(1,3)">★</span><span class="star " onclick="event.stopPropagation();setDataStars(1,4)">★</span><span class="star " onclick="event.stopPropagation();setDataStars(1,5)">★</span></div>
+        <i class="ti ti-chevron-down chevron"></i>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-tabs">
+        <div class="card-tab active" onclick="setCardTab(1,&#39;overview&#39;)">Overview</div>
+        <div class="card-tab " onclick="setCardTab(1,&#39;stages&#39;)">Stages</div>
+        <div class="card-tab " onclick="setCardTab(1,&#39;contacts&#39;)">Contacts</div>
+        <div class="card-tab " onclick="setCardTab(1,&#39;dates&#39;)">Dates</div>
+        <div class="card-tab " onclick="setCardTab(1,&#39;actions&#39;)">Actions (1)</div>
+        <div class="card-tab " onclick="setCardTab(1,&#39;notes&#39;)">Notes</div>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="card-section active" id="sec-1-overview">
+        <div class="fields-grid">
+          <div class="field-group"><div class="field-label">Account Rep</div><input class="field-input" value="" placeholder="Rep name" onchange="updateMuni(1,&#39;rep&#39;,this.value)"></div>
+          <div class="field-group"><div class="field-label">CSM</div>
+            <select class="field-input" onchange="updateMuni(1,&#39;csm&#39;,this.value)">
+              <option value="">Select…</option>
+              <option>Zach</option><option>Tiffany</option><option>Ruth</option><option selected="">Michelle</option><option>Kyle</option><option>Emily</option><option>Alex</option><option>Adam</option>
+            </select>
+          </div>
+          <div class="field-group"><div class="field-label">ERP System</div>
+            <select class="field-input" onchange="updateMuni(1,&#39;erp&#39;,this.value)">
+              <option value="">Select…</option>
+              <option selected="">Tyler Munis</option><option>Tyler New World</option><option>Caselle</option><option>BS&amp;A</option><option>Incode</option><option>Questica</option><option>Civic Systems</option><option>QuickBooks</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field-group"></div>
+          <div class="field-group"><div class="field-label">CGID</div><input class="field-input" value="CG-10241" placeholder="CG-00000" onchange="updateMuni(1,&#39;cgid&#39;,this.value)"></div>
+          <div class="field-group full"><div class="field-label">Products</div>
+            <div class="products-wrap">
+              <button class="product-toggle on" onclick="toggleMuniProd(1,&#39;OB&#39;)">OB</button><button class="product-toggle " onclick="toggleMuniProd(1,&#39;CB&#39;)">CB</button><button class="product-toggle " onclick="toggleMuniProd(1,&#39;DBB&#39;)">DBB</button><button class="product-toggle on" onclick="toggleMuniProd(1,&#39;TR&#39;)">TR</button><button class="product-toggle " onclick="toggleMuniProd(1,&#39;DFR&#39;)">DFR</button><button class="product-toggle " onclick="toggleMuniProd(1,&#39;PB&#39;)">PB</button>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right;margin-top:4px">
+          <button class="danger-btn" onclick="deleteMuni(1)">Delete municipality</button>
+        </div>
+      </div>
+
+      <!-- STAGES -->
+      <div class="card-section " id="sec-1-stages">
+        <div class="stages-row">
+          <button class="stage-btn  current" onclick="toggleStage(1,&#39;Kickoff call&#39;)"> Kickoff call</button><span class="stage-arrow">→</span><button class="stage-btn  " onclick="toggleStage(1,&#39;Data collection&#39;)"> Data collection</button><span class="stage-arrow">→</span><button class="stage-btn  " onclick="toggleStage(1,&#39;Platform configuration&#39;)"> Platform configuration</button><span class="stage-arrow">→</span><button class="stage-btn  " onclick="toggleStage(1,&#39;Mapping review call&#39;)"> Mapping review call</button><span class="stage-arrow">→</span><button class="stage-btn  " onclick="toggleStage(1,&#39;Data Launch&#39;)"> Data Launch</button><span class="stage-arrow">→</span><button class="stage-btn  " onclick="toggleStage(1,&#39;2 Week Close&#39;)"> 2 Week Close</button>
+        </div>
+        <div class="field-label" style="margin-bottom:8px">CHECKLIST</div>
+        <div class="checklist">
+          
+            <div class="check-item" onclick="toggleCheck(1,0)">
+              <div class="check-box "></div>
+              <span class="check-text ">Receive data</span>
+            </div>
+            <div class="check-item" onclick="toggleCheck(1,1)">
+              <div class="check-box "></div>
+              <span class="check-text ">COA</span>
+            </div>
+            <div class="check-item" onclick="toggleCheck(1,2)">
+              <div class="check-box "></div>
+              <span class="check-text ">Kickoff call</span>
+            </div>
+            <div class="check-item" onclick="toggleCheck(1,3)">
+              <div class="check-box "></div>
+              <span class="check-text ">Map and load data</span>
+            </div>
+            <div class="check-item" onclick="toggleCheck(1,4)">
+              <div class="check-box "></div>
+              <span class="check-text ">Schedule mapping review call</span>
+            </div>
+            <div class="check-item" onclick="toggleCheck(1,5)">
+              <div class="check-box "></div>
+              <span class="check-text ">Schedule data launch and review call</span>
+            </div>
+            <div class="check-item" onclick="toggleCheck(1,6)">
+              <div class="check-box "></div>
+              <span class="check-text ">Add 2 week post close out</span>
+            </div>
+        </div>
+      </div>
+
+      <!-- CONTACTS -->
+      <div class="card-section " id="sec-1-contacts">
+        <div class="contacts-grid">
+          
+            <div class="contact-card">
+              <div class="contact-label">Contact 1</div>
+              <input class="field-input" style="margin-bottom:5px" value="Maria Santos" placeholder="Name" onchange="updateContact(1,0,&#39;name&#39;,this.value)">
+              <input class="field-input" value="Finance Director" placeholder="Title" onchange="updateContact(1,0,&#39;title&#39;,this.value)">
+              <div class="contact-stars">
+                <span class="star on" onclick="setContactStar(1,0,1)">★</span><span class="star on" onclick="setContactStar(1,0,2)">★</span><span class="star " onclick="setContactStar(1,0,3)">★</span><span class="star " onclick="setContactStar(1,0,4)">★</span><span class="star " onclick="setContactStar(1,0,5)">★</span>
+              </div>
+            </div>
+            <div class="contact-card">
+              <div class="contact-label">Contact 2</div>
+              <input class="field-input" style="margin-bottom:5px" value="" placeholder="Name" onchange="updateContact(1,1,&#39;name&#39;,this.value)">
+              <input class="field-input" value="" placeholder="Title" onchange="updateContact(1,1,&#39;title&#39;,this.value)">
+              <div class="contact-stars">
+                <span class="star " onclick="setContactStar(1,1,1)">★</span><span class="star " onclick="setContactStar(1,1,2)">★</span><span class="star " onclick="setContactStar(1,1,3)">★</span><span class="star " onclick="setContactStar(1,1,4)">★</span><span class="star " onclick="setContactStar(1,1,5)">★</span>
+              </div>
+            </div>
+            <div class="contact-card">
+              <div class="contact-label">Contact 3</div>
+              <input class="field-input" style="margin-bottom:5px" value="" placeholder="Name" onchange="updateContact(1,2,&#39;name&#39;,this.value)">
+              <input class="field-input" value="" placeholder="Title" onchange="updateContact(1,2,&#39;title&#39;,this.value)">
+              <div class="contact-stars">
+                <span class="star " onclick="setContactStar(1,2,1)">★</span><span class="star " onclick="setContactStar(1,2,2)">★</span><span class="star " onclick="setContactStar(1,2,3)">★</span><span class="star " onclick="setContactStar(1,2,4)">★</span><span class="star " onclick="setContactStar(1,2,5)">★</span>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <!-- DATES -->
+      <div class="card-section " id="sec-1-dates">
+        <div class="dates-grid">
+          <div class="date-block">
+            <div class="date-label">KICKOFF</div>
+            <input type="date" class="field-input" style="margin-bottom:5px" value="2026-02-01" onchange="updateMuni(1,&#39;kickoff&#39;,this.value)">
+            <textarea class="field-input" rows="2" placeholder="Notes…" onchange="updateMuni(1,&#39;kickoffNotes&#39;,this.value)"></textarea>
+          </div>
+          <div class="date-block">
+            <div class="date-label">MAPPING REVIEW</div>
+            <input type="date" class="field-input" style="margin-bottom:5px" value="2026-03-15" onchange="updateMuni(1,&#39;mapping&#39;,this.value)">
+            <textarea class="field-input" rows="2" placeholder="Notes…" onchange="updateMuni(1,&#39;mappingNotes&#39;,this.value)"></textarea>
+          </div>
+          <div class="date-block">
+            <div class="date-label">DATA LAUNCH</div>
+            <input type="date" class="field-input" style="margin-bottom:5px" value="2026-06-15" onchange="updateMuni(1,&#39;launch&#39;,this.value)">
+            <textarea class="field-input" rows="2" placeholder="Notes…" onchange="updateMuni(1,&#39;launchNotes&#39;,this.value)"></textarea>
+          </div>
+          <div class="date-block">
+            <div class="date-label">2 WEEK CLOSE</div>
+            <input type="date" class="field-input" value="" onchange="updateMuni(1,&#39;twoweekdate&#39;,this.value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="card-section " id="sec-1-actions">
+        <div class="actions-list">
+          
+            <div class="action-item">
+              <div class="action-cb " onclick="toggleAction(1,0)"></div>
+              <span class="action-text ">Follow up on budget data</span>
+              <button class="action-del" onclick="deleteAction(1,0)"><i class="ti ti-x"></i></button>
+            </div>
+        </div>
+        <div class="add-action-row">
+          <input class="add-action-input" id="action-inp-1" placeholder="Add action item…" onkeydown="if(event.key===&#39;Enter&#39;)addAction(1)">
+          <button class="btn" onclick="addAction(1)">Add</button>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="card-section " id="sec-1-notes">
+        <textarea class="field-input" rows="6" placeholder="Notes about this municipality…" onchange="updateMuni(1,&#39;notes&#39;,this.value)">Waiting on finance team.</textarea>
+      </div>
+    </div>
+  </div></div>
+      <!-- Chat panel shared -->
+      <div class="chat-panel" id="chat-tracker">
+        <div class="chat-head">
+          <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="8" fill="#111520"></rect>
+            <ellipse cx="18" cy="10" rx="9" ry="6" fill="#c0392b"></ellipse>
+            <rect x="9" y="13" width="18" height="3" rx="1.5" fill="#a93226"></rect>
+            <circle cx="21" cy="5" r="2" fill="#e74c3c"></circle>
+            <ellipse cx="7" cy="20" rx="3" ry="4" fill="#222" stroke="#444" stroke-width="0.5"></ellipse>
+            <ellipse cx="29" cy="20" rx="3" ry="4" fill="#222" stroke="#444" stroke-width="0.5"></ellipse>
+            <path d="M7 17 Q18 11 29 17" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"></path>
+            <rect x="10" y="17" width="16" height="13" rx="3" fill="#050d1a" stroke="#1a3a6a" stroke-width="0.5"></rect>
+            <ellipse cx="14.5" cy="22" rx="2.5" ry="2" fill="#4ab0ff"></ellipse>
+            <ellipse cx="21.5" cy="22" rx="2.5" ry="2" fill="#4ab0ff"></ellipse>
+            <path d="M14 26.5 Q18 28.5 22 26.5" fill="none" stroke="#4ab0ff" stroke-width="0.8" stroke-linecap="round"></path>
+          </svg>
+          <div><div class="chat-bot-name">MMMM-BOT</div><div class="chat-bot-sub">Ask about your municipalities</div></div>
+        </div>
+        <div class="chat-msgs" id="chat-msgs-tracker"><div class="msg bot"><div class="msg-bubble">Hey! 👋 I'm Mmmm-Bot. I have full visibility into your municipality pipeline. Ask me who needs attention, what's coming up, or anything about your accounts. 🎵</div><div class="msg-time">04:22 PM</div></div></div>
+        <div class="chat-chips">
+          <button class="chip" onclick="sendChip(this,&#39;tracker&#39;)">Who needs attention?</button>
+          <button class="chip" onclick="sendChip(this,&#39;tracker&#39;)">Stuck accounts</button>
+          <button class="chip" onclick="sendChip(this,&#39;tracker&#39;)">Upcoming launches</button>
+          <button class="chip" onclick="sendChip(this,&#39;tracker&#39;)">Pending actions</button>
+          <button class="chip" onclick="sendChip(this,&#39;tracker&#39;)">Summarize pipeline</button>
+        </div>
+        <div class="chat-input-row">
+          <textarea class="chat-inp" id="chat-inp-tracker" placeholder="Ask Mmmm-Bot…" rows="1" onkeydown="chatKey(event,&#39;tracker&#39;)" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="send-tracker" onclick="sendChat(&#39;tracker&#39;)">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ NOTES VIEW ══════ -->
+<div class="view" id="view-notes">
+  <div class="notes-layout" style="flex:1;overflow:hidden">
+
+    <!-- Notes sidebar -->
+    <div class="notes-sidebar">
+      <div class="ns-section">Notebooks</div>
+      <div id="ns-projects">
+    <div class="ns-project active" onclick="selectNotebook(&#39;nb1&#39;)">
+      <div class="ns-dot"></div>General Notes
+    </div></div>
+      <div class="ns-add" onclick="openNewNotebook()"><span style="font-size:15px">+</span> New Notebook</div>
+      <div class="ns-bottom" id="ns-count">1 note</div>
+    </div>
+
+    <!-- Notes list -->
+    <div class="notes-list-panel">
+      <div class="nlp-header">
+        <span class="nlp-title">NOTES</span>
+        <button class="icon-btn" onclick="createNote()" title="New note">+</button>
+      </div>
+      <div class="notes-list" id="notes-list">
+    <div class="note-card " onclick="selectNote(&#39;n1&#39;)">
+      <div class="nc-title">Welcome 🎧</div>
+      <div class="nc-preview">Welcome to Mmmm-Bot Workspace!
+
+Use this side for meeti</div>
+      <div class="nc-meta">
+        
+        
+        <span class="nc-date">04:22 PM</span>
+      </div>
+    </div></div>
+    </div>
+
+    <!-- Editor -->
+    <div class="editor-panel">
+      <div class="editor-empty" id="editor-empty">
+        <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="opacity:0.3"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        <p>Select or create a note</p>
+      </div>
+      <div id="editor-content" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+        <div class="editor-toolbar">
+          <input class="note-title-inp" id="note-title" placeholder="Note title…" oninput="saveNote()">
+          <div class="toolbar-btns">
+            <button class="sm-btn" onclick="extractTasks()">⚡ Tasks</button>
+            <button class="sm-btn primary" onclick="saveNote()">Save</button>
+            <button class="sm-btn danger" onclick="deleteNote()">✕</button>
+          </div>
+        </div>
+        <textarea class="note-textarea" id="note-body" placeholder="Write notes, paste transcripts, meeting summaries…" oninput="saveNote()"></textarea>
+
+        <!-- Tasks -->
+        <div id="tasks-section" class="hidden tasks-panel">
+          <div class="tasks-header">
+            <span class="tasks-title">ACTION ITEMS</span>
+            <button class="icon-btn" onclick="document.getElementById(&#39;tasks-section&#39;).classList.add(&#39;hidden&#39;)" style="width:20px;height:20px;font-size:11px">✕</button>
+          </div>
+          <div id="task-list"></div>
+        </div>
+
+        <!-- Audio -->
+        <div class="audio-panel">
+          <div class="audio-header">
+            <span class="audio-title">🎙 AUDIO NOTES</span>
+            <div class="audio-btns">
+              <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">⏺ Record</button>
+              <label class="upload-lbl">↑ Upload<input type="file" accept="audio/*" style="display:none" onchange="handleUpload(event)"></label>
+            </div>
+          </div>
+          <div id="rec-bar" class="rec-bar hidden">
+            <div class="rec-dot"></div>
+            <span style="font-size:11px;color:var(--text2)">Recording…</span>
+            <span class="rec-timer" id="rec-timer">0:00</span>
+          </div>
+          <div id="audio-clips"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat panel -->
+    <div class="chat-panel">
+      <div class="chat-head">
+        <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="8" fill="#111520"></rect>
+          <ellipse cx="18" cy="10" rx="9" ry="6" fill="#c0392b"></ellipse>
+          <rect x="9" y="13" width="18" height="3" rx="1.5" fill="#a93226"></rect>
+          <circle cx="21" cy="5" r="2" fill="#e74c3c"></circle>
+          <ellipse cx="7" cy="20" rx="3" ry="4" fill="#222" stroke="#444" stroke-width="0.5"></ellipse>
+          <ellipse cx="29" cy="20" rx="3" ry="4" fill="#222" stroke="#444" stroke-width="0.5"></ellipse>
+          <path d="M7 17 Q18 11 29 17" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"></path>
+          <rect x="10" y="17" width="16" height="13" rx="3" fill="#050d1a" stroke="#1a3a6a" stroke-width="0.5"></rect>
+          <ellipse cx="14.5" cy="22" rx="2.5" ry="2" fill="#4ab0ff"></ellipse>
+          <ellipse cx="21.5" cy="22" rx="2.5" ry="2" fill="#4ab0ff"></ellipse>
+          <path d="M14 26.5 Q18 28.5 22 26.5" fill="none" stroke="#4ab0ff" stroke-width="0.8" stroke-linecap="round"></path>
+        </svg>
+        <div><div class="chat-bot-name">MMMM-BOT</div><div class="chat-bot-sub">Ask about your notes</div></div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs-notes"><div class="msg bot"><div class="msg-bubble">Hey! 👋 Switch to a notebook and I'll help you summarize notes, extract action items, or answer questions about your content. 🎵</div><div class="msg-time">04:22 PM</div></div></div>
+      <div class="chat-chips">
+        <button class="chip" onclick="sendChip(this,&#39;notes&#39;)">Summarize notes</button>
+        <button class="chip" onclick="sendChip(this,&#39;notes&#39;)">Extract action items</button>
+        <button class="chip" onclick="sendChip(this,&#39;notes&#39;)">Key themes</button>
+        <button class="chip" onclick="sendChip(this,&#39;notes&#39;)">Draft follow-up</button>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-inp" id="chat-inp-notes" placeholder="Ask Mmmm-Bot…" rows="1" onkeydown="chatKey(event,&#39;notes&#39;)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-notes" onclick="sendChat(&#39;notes&#39;)">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MUNICIPALITY MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-title">ADD MUNICIPALITY</div>
+    <div class="fields-grid">
+      <div class="field-group full"><div class="field-label">Municipality Name</div><input class="field-input" id="m-name" placeholder="City of Springfield"></div>
+      <div class="field-group"><div class="field-label">CGID</div><input class="field-input" id="m-cgid" placeholder="CG-00000"></div>
+      <div class="field-group"><div class="field-label">Account Rep</div><input class="field-input" id="m-rep" placeholder="Rep name"></div>
+      <div class="field-group"><div class="field-label">CSM</div>
+        <select class="field-input" id="m-csm">
+          <option value="">Select CSM…</option>
+          <option>Zach</option><option>Tiffany</option><option>Ruth</option><option>Michelle</option><option>Kyle</option><option>Emily</option><option>Alex</option><option>Adam</option>
+        </select>
+      </div>
+      <div class="field-group"><div class="field-label">ERP System</div>
+        <select class="field-input" id="m-erp">
+          <option value="">Select ERP…</option>
+          <option>Tyler Munis</option><option>Tyler New World</option><option>Caselle</option><option>BS&amp;A</option><option>Incode</option><option>Questica</option><option>Civic Systems</option><option>QuickBooks</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field-group"><div class="field-label">ERP Other</div><input class="field-input" id="m-erp-other" placeholder="If Other…"></div>
+      <div class="field-group full"><div class="field-label">Products</div>
+        <div class="products-wrap" id="modal-products">
+          <button type="button" class="product-toggle" data-val="OB" onclick="toggleProd(this)">OB</button>
+          <button type="button" class="product-toggle" data-val="CB" onclick="toggleProd(this)">CB</button>
+          <button type="button" class="product-toggle" data-val="DBB" onclick="toggleProd(this)">DBB</button>
+          <button type="button" class="product-toggle" data-val="TR" onclick="toggleProd(this)">TR</button>
+          <button type="button" class="product-toggle" data-val="DFR" onclick="toggleProd(this)">DFR</button>
+          <button type="button" class="product-toggle" data-val="PB" onclick="toggleProd(this)">PB</button>
+        </div>
+      </div>
+      <div class="field-group"><div class="field-label">Kickoff Date</div><input type="date" class="field-input" id="m-kickoff"></div>
+      <div class="field-group"><div class="field-label">Mapping Review Date</div><input type="date" class="field-input" id="m-mapping"></div>
+      <div class="field-group"><div class="field-label">Data Launch Date</div><input type="date" class="field-input" id="m-launch"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewMuni()"><i class="ti ti-plus"></i> Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW NOTEBOOK MODAL -->
+<div class="modal-overlay" id="nb-modal">
+  <div class="modal" style="width:340px">
+    <div class="modal-title">NEW NOTEBOOK</div>
+    <input class="field-input" id="nb-name" placeholder="Notebook name…" onkeydown="if(event.key===&#39;Enter&#39;)confirmNotebook()" style="width:100%;margin-bottom:4px">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeNotebook()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmNotebook()">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════
+const STAGES = ["Kickoff call","Data collection","Platform configuration","Mapping review call","Data Launch","2 Week Close"];
+const PRODUCTS = ["OB","CB","DBB","TR","DFR","PB"];
+const CSMS = ["All","Zach","Tiffany","Ruth","Michelle","Kyle","Emily","Alex","Adam"];
+const CHECKLIST = ["Receive data","COA","Kickoff call","Map and load data","Schedule mapping review call","Schedule data launch and review call","Add 2 week post close out"];
+const ERP_OPTS = ["Tyler Munis","Tyler New World","Caselle","BS&A","Incode","Questica","Civic Systems","QuickBooks","Other"];
+const AVATAR_COLORS = [["#1a2a4a","#4ab0ff"],["#1a3a1a","#4caf50"],["#3a1a3a","#c678dd"],["#3a2a1a","#f39c12"],["#3a1a1a","#e06c75"],["#1a3a3a","#56b6c2"],["#2a1a3a","#9b59b6"]];
+
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+let D = JSON.parse(localStorage.getItem('mmmmbot_v2')||'null') || {
+  munis: [
+    {
+      id:1, name:"City of Lakewood", cgid:"CG-10241",
+      contacts:[{name:"Maria Santos",title:"Finance Director",stars:2},{name:"",title:"",stars:0},{name:"",title:"",stars:0}],
+      rep:"", csm:"Michelle", erp:"Tyler Munis", erpOther:"", products:["OB","TR"],
+      kickoff:"2026-02-01", kickoffNotes:"", mapping:"2026-03-15", mappingNotes:"", launch:"2026-06-15", launchNotes:"", twoweekdate:"",
+      dataStars:2, checklist:{}, stages:{}, actions:[{id:1,text:"Follow up on budget data",done:false}], notes:"Waiting on finance team.",
+      _open:false, _tab:"overview"
+    }
+  ],
+  nextId: 2,
+  activeCsm: "All"
+};
+let notebooks = JSON.parse(localStorage.getItem('mmmmbot_notebooks')||'null') || [{id:'nb1',name:'General Notes',created:Date.now()}];
+let notes = JSON.parse(localStorage.getItem('mmmmbot_notes2')||'null') || [{id:'n1',notebookId:'nb1',title:'Welcome 🎧',body:'Welcome to Mmmm-Bot Workspace!\n\nUse this side for meeting notes, audio clips, and AI-powered summaries.\nSwitch to Municipality Tracker for your ClearGov pipeline.',tasks:[],audioClips:[],created:Date.now(),updated:Date.now()}];
+let activeNotebook = notebooks[0]?.id || null;
+let activeNote = null;
+
+function saveAll(){
+  localStorage.setItem('mmmmbot_v2', JSON.stringify(D));
+  localStorage.setItem('mmmmbot_notebooks', JSON.stringify(notebooks));
+  localStorage.setItem('mmmmbot_notes2', JSON.stringify(notes));
+}
+
+// ══════════════════════════════════════════
+// VIEW SWITCHING
+// ══════════════════════════════════════════
+function switchView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.nav-tab')[v==='tracker'?0:1].classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// TRACKER
+// ══════════════════════════════════════════
+function renderTracker(){
+  const q = document.getElementById('t-search').value.toLowerCase();
+  const stageFilter = document.getElementById('t-stage').value;
+  let list = D.munis.filter(m=>{
+    if(D.activeCsm !== 'All' && m.csm !== D.activeCsm) return false;
+    if(stageFilter && getCurrentStage(m) !== stageFilter) return false;
+    if(q && !m.name.toLowerCase().includes(q) && !m.cgid.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderSummary(list);
+  renderCSMTabs();
+  const area = document.getElementById('cards-area');
+  if(list.length === 0){ area.innerHTML='<div class="empty-hint">No municipalities match your filters</div>'; return; }
+  area.innerHTML = list.map(m=>renderCard(m)).join('');
+}
+
+function renderSummary(list){
+  const total = list.length;
+  const live = list.filter(m=>m.stages['Data Launch']==='done').length;
+  const prog = list.filter(m=>getStageIdx(m)>0 && !m.stages['Data Launch']).length;
+  const stuck = list.filter(m=>isStuck(m)).length;
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="sum-card"><div class="sum-label">TOTAL</div><div class="sum-val">${total}</div></div>
+    <div class="sum-card s-prog"><div class="sum-label">IN PROGRESS</div><div class="sum-val">${prog}</div></div>
+    <div class="sum-card s-live"><div class="sum-label">LAUNCHED</div><div class="sum-val">${live}</div></div>
+    <div class="sum-card s-stuck"><div class="sum-label">ATTENTION</div><div class="sum-val">${stuck}</div></div>`;
+}
+
+function renderCSMTabs(){
+  const csms = ['All', ...new Set(D.munis.map(m=>m.csm).filter(Boolean))];
+  document.getElementById('csm-tabs').innerHTML = csms.map(c=>`
+    <button class="csm-tab ${D.activeCsm===c?'active':''}" onclick="setCsm('${c}')">${c}</button>`).join('');
+}
+
+function setCsm(c){ D.activeCsm=c; saveAll(); renderTracker(); }
+
+function getCurrentStage(m){
+  for(let i=STAGES.length-1;i>=0;i--){ if(m.stages[STAGES[i]]==='done') return i<STAGES.length-1?STAGES[i+1]:STAGES[i]; }
+  return STAGES[0];
+}
+function getStageIdx(m){ for(let i=STAGES.length-1;i>=0;i--){ if(m.stages[STAGES[i]]==='done') return i; } return -1; }
+function isStuck(m){ const idx=getStageIdx(m); return idx>=0 && idx<STAGES.length-1 && !m.stages['Data Launch']; }
+
+function getStageBadge(m){
+  const done = STAGES.filter(s=>m.stages[s]==='done').length;
+  if(done===0) return `<span class="stage-badge notstarted">Not started</span>`;
+  if(m.stages['2 Week Close']==='done') return `<span class="stage-badge done">✓ Complete</span>`;
+  if(m.stages['Data Launch']==='done') return `<span class="stage-badge done">✓ Launched</span>`;
+  const cur = STAGES[done] || STAGES[STAGES.length-1];
+  return `<span class="stage-badge active">${cur}</span>`;
+}
+
+function avatarFor(m){
+  const idx = m.id % AVATAR_COLORS.length;
+  const [bg,fg] = AVATAR_COLORS[idx];
+  const initials = m.name.split(' ').filter(w=>/^[A-Z]/i.test(w)).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  return `<div class="card-avatar" style="background:${bg};color:${fg}">${initials||'?'}</div>`;
+}
+
+function renderCard(m){
+  const tab = m._tab || 'overview';
+  return `
+  <div class="muni-card ${m._open?'expanded':''}" id="card-${m.id}">
+    <div class="card-head" onclick="toggleCard(${m.id})">
+      ${avatarFor(m)}
+      <div class="card-main">
+        <div class="card-name">${m.name}</div>
+        <div class="card-meta">
+          <span class="card-cgid">${m.cgid||'No CGID'}</span>
+          ${m.csm?`<span class="card-csm">${m.csm}</span>`:''}
+          ${getStageBadge(m)}
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="product-pills">${(m.products||[]).map(p=>`<span class="ppill">${p}</span>`).join('')}</div>
+        <div class="star-row">${[1,2,3,4,5].map(i=>`<span class="star ${(m.dataStars||0)>=i?'on':''}" onclick="event.stopPropagation();setDataStars(${m.id},${i})">★</span>`).join('')}</div>
+        <i class="ti ti-chevron-down chevron"></i>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-tabs">
+        <div class="card-tab ${tab==='overview'?'active':''}" onclick="setCardTab(${m.id},'overview')">Overview</div>
+        <div class="card-tab ${tab==='stages'?'active':''}" onclick="setCardTab(${m.id},'stages')">Stages</div>
+        <div class="card-tab ${tab==='contacts'?'active':''}" onclick="setCardTab(${m.id},'contacts')">Contacts</div>
+        <div class="card-tab ${tab==='dates'?'active':''}" onclick="setCardTab(${m.id},'dates')">Dates</div>
+        <div class="card-tab ${tab==='actions'?'active':''}" onclick="setCardTab(${m.id},'actions')">Actions (${(m.actions||[]).filter(a=>!a.done).length})</div>
+        <div class="card-tab ${tab==='notes'?'active':''}" onclick="setCardTab(${m.id},'notes')">Notes</div>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="card-section ${tab==='overview'?'active':''}" id="sec-${m.id}-overview">
+        <div class="fields-grid">
+          <div class="field-group"><div class="field-label">Account Rep</div><input class="field-input" value="${m.rep||''}" placeholder="Rep name" onchange="updateMuni(${m.id},'rep',this.value)"/></div>
+          <div class="field-group"><div class="field-label">CSM</div>
+            <select class="field-input" onchange="updateMuni(${m.id},'csm',this.value)">
+              <option value="">Select…</option>
+              ${CSMS.slice(1).map(c=>`<option ${m.csm===c?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field-group"><div class="field-label">ERP System</div>
+            <select class="field-input" onchange="updateMuni(${m.id},'erp',this.value)">
+              <option value="">Select…</option>
+              ${ERP_OPTS.map(e=>`<option ${m.erp===e?'selected':''}>${e}</option>`).join('')}
+            </select>
+          </div>
+          ${m.erp==='Other'?`<div class="field-group"><div class="field-label">ERP Detail</div><input class="field-input" value="${m.erpOther||''}" placeholder="Specify ERP…" onchange="updateMuni(${m.id},'erpOther',this.value)"/></div>`:'<div class="field-group"></div>'}
+          <div class="field-group"><div class="field-label">CGID</div><input class="field-input" value="${m.cgid||''}" placeholder="CG-00000" onchange="updateMuni(${m.id},'cgid',this.value)"/></div>
+          <div class="field-group full"><div class="field-label">Products</div>
+            <div class="products-wrap">
+              ${PRODUCTS.map(p=>`<button class="product-toggle ${(m.products||[]).includes(p)?'on':''}" onclick="toggleMuniProd(${m.id},'${p}')">${p}</button>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right;margin-top:4px">
+          <button class="danger-btn" onclick="deleteMuni(${m.id})">Delete municipality</button>
+        </div>
+      </div>
+
+      <!-- STAGES -->
+      <div class="card-section ${tab==='stages'?'active':''}" id="sec-${m.id}-stages">
+        <div class="stages-row">
+          ${STAGES.map((s,i)=>{
+            const done = m.stages[s]==='done';
+            const doneCount = STAGES.filter(x=>m.stages[x]==='done').length;
+            const isCurrent = !done && i===doneCount;
+            return `${i>0?'<span class="stage-arrow">→</span>':''}<button class="stage-btn ${done?'done':''} ${isCurrent?'current':''}" onclick="toggleStage(${m.id},'${s}')">${done?'✓ ':''} ${s}</button>`;
+          }).join('')}
+        </div>
+        <div class="field-label" style="margin-bottom:8px">CHECKLIST</div>
+        <div class="checklist">
+          ${CHECKLIST.map((c,i)=>`
+            <div class="check-item" onclick="toggleCheck(${m.id},${i})">
+              <div class="check-box ${(m.checklist&&m.checklist[i])?'checked':''}">${(m.checklist&&m.checklist[i])?'✓':''}</div>
+              <span class="check-text ${(m.checklist&&m.checklist[i])?'checked':''}">${c}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- CONTACTS -->
+      <div class="card-section ${tab==='contacts'?'active':''}" id="sec-${m.id}-contacts">
+        <div class="contacts-grid">
+          ${(m.contacts||[{},{},{}]).map((c,ci)=>`
+            <div class="contact-card">
+              <div class="contact-label">Contact ${ci+1}</div>
+              <input class="field-input" style="margin-bottom:5px" value="${c.name||''}" placeholder="Name" onchange="updateContact(${m.id},${ci},'name',this.value)"/>
+              <input class="field-input" value="${c.title||''}" placeholder="Title" onchange="updateContact(${m.id},${ci},'title',this.value)"/>
+              <div class="contact-stars">
+                ${[1,2,3,4,5].map(i=>`<span class="star ${(c.stars||0)>=i?'on':''}" onclick="setContactStar(${m.id},${ci},${i})">★</span>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- DATES -->
+      <div class="card-section ${tab==='dates'?'active':''}" id="sec-${m.id}-dates">
+        <div class="dates-grid">
+          <div class="date-block">
+            <div class="date-label">KICKOFF</div>
+            <input type="date" class="field-input" style="margin-bottom:5px" value="${m.kickoff||''}" onchange="updateMuni(${m.id},'kickoff',this.value)"/>
+            <textarea class="field-input" rows="2" placeholder="Notes…" onchange="updateMuni(${m.id},'kickoffNotes',this.value)">${m.kickoffNotes||''}</textarea>
+          </div>
+          <div class="date-block">
+            <div class="date-label">MAPPING REVIEW</div>
+            <input type="date" class="field-input" style="margin-bottom:5px" value="${m.mapping||''}" onchange="updateMuni(${m.id},'mapping',this.value)"/>
+            <textarea class="field-input" rows="2" placeholder="Notes…" onchange="updateMuni(${m.id},'mappingNotes',this.value)">${m.mappingNotes||''}</textarea>
+          </div>
+          <div class="date-block">
+            <div class="date-label">DATA LAUNCH</div>
+            <input type="date" class="field-input" style="margin-bottom:5px" value="${m.launch||''}" onchange="updateMuni(${m.id},'launch',this.value)"/>
+            <textarea class="field-input" rows="2" placeholder="Notes…" onchange="updateMuni(${m.id},'launchNotes',this.value)">${m.launchNotes||''}</textarea>
+          </div>
+          <div class="date-block">
+            <div class="date-label">2 WEEK CLOSE</div>
+            <input type="date" class="field-input" value="${m.twoweekdate||''}" onchange="updateMuni(${m.id},'twoweekdate',this.value)"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="card-section ${tab==='actions'?'active':''}" id="sec-${m.id}-actions">
+        <div class="actions-list">
+          ${(m.actions||[]).map((a,ai)=>`
+            <div class="action-item">
+              <div class="action-cb ${a.done?'done':''}" onclick="toggleAction(${m.id},${ai})">${a.done?'✓':''}</div>
+              <span class="action-text ${a.done?'done':''}">${a.text}</span>
+              <button class="action-del" onclick="deleteAction(${m.id},${ai})"><i class="ti ti-x"></i></button>
+            </div>`).join('')}
+        </div>
+        <div class="add-action-row">
+          <input class="add-action-input" id="action-inp-${m.id}" placeholder="Add action item…" onkeydown="if(event.key==='Enter')addAction(${m.id})"/>
+          <button class="btn" onclick="addAction(${m.id})">Add</button>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="card-section ${tab==='notes'?'active':''}" id="sec-${m.id}-notes">
+        <textarea class="field-input" rows="6" placeholder="Notes about this municipality…" onchange="updateMuni(${m.id},'notes',this.value)">${m.notes||''}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(id){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ m._open=!m._open; saveAll(); renderTracker(); }
+}
+function setCardTab(id,tab){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ m._tab=tab; saveAll(); renderTracker(); }
+}
+function updateMuni(id,key,val){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ m[key]=val; saveAll(); }
+  if(['csm','name','cgid','products'].includes(key)) renderTracker();
+}
+function updateContact(id,ci,key,val){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ if(!m.contacts[ci]) m.contacts[ci]={}; m.contacts[ci][key]=val; saveAll(); }
+}
+function setContactStar(id,ci,v){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ if(!m.contacts[ci]) m.contacts[ci]={}; m.contacts[ci].stars = m.contacts[ci].stars===v?0:v; saveAll(); renderTracker(); }
+}
+function setDataStars(id,v){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ m.dataStars = m.dataStars===v?0:v; saveAll(); renderTracker(); }
+}
+function toggleMuniProd(id,p){
+  const m = D.munis.find(x=>x.id===id);
+  if(!m) return;
+  if(!m.products) m.products=[];
+  m.products = m.products.includes(p) ? m.products.filter(x=>x!==p) : [...m.products,p];
+  saveAll(); renderTracker();
+}
+function toggleStage(id,stage){
+  const m = D.munis.find(x=>x.id===id);
+  if(!m) return;
+  m.stages[stage] = m.stages[stage]==='done' ? '' : 'done';
+  saveAll(); renderTracker();
+}
+function toggleCheck(id,i){
+  const m = D.munis.find(x=>x.id===id);
+  if(!m) return;
+  if(!m.checklist) m.checklist={};
+  m.checklist[i] = !m.checklist[i];
+  saveAll(); renderTracker();
+}
+function addAction(id){
+  const inp = document.getElementById('action-inp-'+id);
+  const text = inp.value.trim();
+  if(!text) return;
+  const m = D.munis.find(x=>x.id===id);
+  if(!m) return;
+  if(!m.actions) m.actions=[];
+  m.actions.push({id:Date.now(),text,done:false});
+  inp.value='';
+  saveAll(); renderTracker();
+}
+function toggleAction(id,ai){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ m.actions[ai].done=!m.actions[ai].done; saveAll(); renderTracker(); }
+}
+function deleteAction(id,ai){
+  const m = D.munis.find(x=>x.id===id);
+  if(m){ m.actions.splice(ai,1); saveAll(); renderTracker(); }
+}
+function deleteMuni(id){
+  if(!confirm('Delete this municipality? This cannot be undone.')) return;
+  D.munis = D.munis.filter(x=>x.id!==id);
+  saveAll(); renderTracker();
+}
+
+// ADD MODAL
+function openAddModal(){ 
+  document.querySelectorAll('#modal-products .product-toggle').forEach(b=>b.classList.remove('on'));
+  document.getElementById('add-modal').classList.add('open');
+}
+function closeAddModal(){ document.getElementById('add-modal').classList.remove('open'); }
+function toggleProd(btn){ btn.classList.toggle('on'); }
+function saveNewMuni(){
+  const name = document.getElementById('m-name').value.trim();
+  if(!name){ alert('Municipality name is required'); return; }
+  const products = [...document.querySelectorAll('#modal-products .product-toggle.on')].map(b=>b.dataset.val);
+  D.munis.push({
+    id:D.nextId++, name,
+    cgid: document.getElementById('m-cgid').value.trim(),
+    rep: document.getElementById('m-rep').value.trim(),
+    csm: document.getElementById('m-csm').value,
+    erp: document.getElementById('m-erp').value,
+    erpOther: document.getElementById('m-erp-other').value.trim(),
+    products,
+    kickoff: document.getElementById('m-kickoff').value,
+    mapping: document.getElementById('m-mapping').value,
+    launch: document.getElementById('m-launch').value,
+    mappingNotes:'', kickoffNotes:'', launchNotes:'', twoweekdate:'',
+    dataStars:0, contacts:[{name:'',title:'',stars:0},{name:'',title:'',stars:0},{name:'',title:'',stars:0}],
+    checklist:{}, stages:{}, actions:[], notes:'', _open:true, _tab:'overview'
+  });
+  ['m-name','m-cgid','m-rep','m-erp-other','m-kickoff','m-mapping','m-launch'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-csm').value='';
+  document.getElementById('m-erp').value='';
+  document.querySelectorAll('#modal-products .product-toggle').forEach(b=>b.classList.remove('on'));
+  saveAll(); closeAddModal(); renderTracker(); showToast('Municipality added!');
+}
+
+// EXCEL EXPORT
+function exportExcel(){
+  if(!window.XLSX){ showToast('XLSX library loading…'); return; }
+  const wb = XLSX.utils.book_new();
+  const rows = [["Municipality","CGID","Account Rep","CSM","ERP","Products","Data Stars",
+    "Contact 1","Title 1","Stars 1","Contact 2","Title 2","Stars 2","Contact 3","Title 3","Stars 3",
+    "Kickoff","Mapping Review","Data Launch","2 Week Close",
+    ...STAGES,"Stages Done","Status","Pending Actions","Notes"]];
+  D.munis.forEach(m=>{
+    const c = m.contacts||[];
+    const done = STAGES.filter(s=>m.stages[s]==='done').length;
+    const erp = m.erp==='Other'?(m.erpOther||'Other'):m.erp;
+    let status='Not started';
+    if(m.stages['2 Week Close']==='done') status='Complete';
+    else if(m.stages['Data Launch']==='done') status='Launched';
+    else if(done>0) status='In progress';
+    rows.push([m.name,m.cgid,m.rep,m.csm,erp,(m.products||[]).join(', '),m.dataStars||0,
+      (c[0]?.name||''),(c[0]?.title||''),(c[0]?.stars||0),
+      (c[1]?.name||''),(c[1]?.title||''),(c[1]?.stars||0),
+      (c[2]?.name||''),(c[2]?.title||''),(c[2]?.stars||0),
+      m.kickoff||'',m.mapping||'',m.launch||'',m.twoweekdate||'',
+      ...STAGES.map(s=>m.stages[s]==='done'?'✓':''),
+      `${done}/${STAGES.length}`,status,
+      (m.actions||[]).filter(a=>!a.done).map(a=>a.text).join('; '),
+      m.notes||'']);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:28},{wch:12},{wch:14},{wch:14},{wch:16},{wch:20},{wch:10},
+    {wch:20},{wch:18},{wch:7},{wch:20},{wch:18},{wch:7},{wch:20},{wch:18},{wch:7},
+    {wch:12},{wch:14},{wch:12},{wch:12},...STAGES.map(()=>({wch:9})),{wch:12},{wch:14},{wch:35},{wch:40}];
+  XLSX.utils.book_append_sheet(wb,ws,'Municipalities');
+  const a2 = [["Municipality","CGID","Action Item","Status","CSM"]];
+  D.munis.forEach(m=>(m.actions||[]).forEach(a=>a2.push([m.name,m.cgid,a.text,a.done?'Done':'Pending',m.csm])));
+  const ws2 = XLSX.utils.aoa_to_sheet(a2);
+  XLSX.utils.book_append_sheet(wb,ws2,'Action Items');
+  XLSX.writeFile(wb,`MunicipalityTracker_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast('Excel exported!');
+}
+
+// ══════════════════════════════════════════
+// NOTES
+// ══════════════════════════════════════════
+function renderNotebooks(){
+  document.getElementById('ns-projects').innerHTML = notebooks.map(nb=>`
+    <div class="ns-project ${activeNotebook===nb.id?'active':''}" onclick="selectNotebook('${nb.id}')">
+      <div class="ns-dot"></div>${nb.name}
+    </div>`).join('');
+  const count = notes.filter(n=>n.notebookId===activeNotebook).length;
+  document.getElementById('ns-count').textContent = `${count} note${count!==1?'s':''}`;
+}
+
+function selectNotebook(id){ activeNotebook=id; activeNote=null; renderNotebooks(); renderNotesList(); clearEditor(); }
+
+function renderNotesList(){
+  const list = notes.filter(n=>n.notebookId===activeNotebook).sort((a,b)=>b.updated-a.updated);
+  const el = document.getElementById('notes-list');
+  if(!list.length){ el.innerHTML='<div class="empty-hint">No notes yet — click + to create</div>'; return; }
+  el.innerHTML = list.map(n=>`
+    <div class="note-card ${activeNote===n.id?'active':''}" onclick="selectNote('${n.id}')">
+      <div class="nc-title">${n.title||'Untitled'}</div>
+      <div class="nc-preview">${n.body.slice(0,55)||'Empty…'}</div>
+      <div class="nc-meta">
+        ${n.audioClips?.length?`<span class="nc-tag tag-audio">🎙 ${n.audioClips.length}</span>`:''}
+        ${n.tasks?.length?`<span class="nc-tag tag-task">✓ ${n.tasks.length}</span>`:''}
+        <span class="nc-date">${fmtDate(n.updated)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function fmtDate(ts){ const d=new Date(ts),now=new Date(); return d.toDateString()===now.toDateString()?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString([],{month:'short',day:'numeric'}); }
+
+function createNote(){
+  if(!activeNotebook) return;
+  const n={id:'n'+Date.now(),notebookId:activeNotebook,title:'',body:'',tasks:[],audioClips:[],created:Date.now(),updated:Date.now()};
+  notes.unshift(n); saveAll(); renderNotesList(); selectNote(n.id);
+}
+
+function selectNote(id){
+  activeNote=id;
+  const n=notes.find(x=>x.id===id);
+  if(!n) return;
+  document.getElementById('editor-empty').style.display='none';
+  document.getElementById('editor-content').classList.remove('hidden');
+  document.getElementById('note-title').value=n.title;
+  document.getElementById('note-body').value=n.body;
+  renderTaskList(n); renderAudioClips(n); renderNotesList();
+}
+
+function clearEditor(){
+  document.getElementById('editor-empty').style.display='flex';
+  document.getElementById('editor-content').classList.add('hidden');
+}
+
+function saveNote(){
+  if(!activeNote) return;
+  const n=notes.find(x=>x.id===activeNote);
+  if(!n) return;
+  n.title=document.getElementById('note-title').value;
+  n.body=document.getElementById('note-body').value;
+  n.updated=Date.now();
+  saveAll(); renderNotesList(); renderNotebooks();
+}
+
+function deleteNote(){
+  if(!activeNote) return;
+  notes=notes.filter(x=>x.id!==activeNote);
+  activeNote=null; saveAll(); renderNotesList(); renderNotebooks(); clearEditor();
+}
+
+function openNewNotebook(){ document.getElementById('nb-modal').classList.add('open'); setTimeout(()=>document.getElementById('nb-name').focus(),100); }
+function closeNotebook(){ document.getElementById('nb-modal').classList.remove('open'); document.getElementById('nb-name').value=''; }
+function confirmNotebook(){
+  const name=document.getElementById('nb-name').value.trim();
+  if(!name) return;
+  const nb={id:'nb'+Date.now(),name,created:Date.now()};
+  notebooks.push(nb); saveAll(); closeNotebook(); selectNotebook(nb.id); renderNotebooks();
+}
+
+// TASKS
+function renderTaskList(n){
+  if(!n.tasks||!n.tasks.length){ document.getElementById('tasks-section').classList.add('hidden'); return; }
+  document.getElementById('tasks-section').classList.remove('hidden');
+  document.getElementById('task-list').innerHTML=n.tasks.map((t,i)=>`
+    <div class="task-row">
+      <div class="task-cb ${t.done?'done':''}" onclick="toggleTask(${i})">${t.done?'✓':''}</div>
+      <span class="task-text ${t.done?'done':''}">${t.text}</span>
+    </div>`).join('');
+}
+function toggleTask(i){ const n=notes.find(x=>x.id===activeNote); if(n){n.tasks[i].done=!n.tasks[i].done;saveAll();renderTaskList(n);} }
+
+async function extractTasks(){
+  saveNote();
+  const n=notes.find(x=>x.id===activeNote);
+  if(!n||!n.body.trim()){ botMsg('notes','Write something in the note first!'); return; }
+  botMsg('notes','Extracting action items… 🎵');
+  showTyping('notes');
+  try{
+    const res=await callClaude(`Extract all action items and tasks from this note. Return ONLY a JSON array of strings. No markdown, no preamble.\n\nNote:\n${n.body}`);
+    hideTyping('notes');
+    let tasks=[];
+    try{ tasks=JSON.parse(res.replace(/```json|```/g,'')); }catch(e){}
+    if(!tasks.length){ botMsg('notes',"No clear action items found. Try writing more specific tasks."); return; }
+    n.tasks=tasks.map(t=>({text:t,done:false}));
+    saveAll(); renderTaskList(n); renderNotesList();
+    botMsg('notes',`Found ${tasks.length} action item${tasks.length>1?'s':''} ✓`);
+  }catch(e){ hideTyping('notes'); botMsg('notes','Oops, hit a snag. Try again?'); }
+}
+
+// AUDIO
+let mediaRecorder=null,recChunks=[],recTimer=null,recSecs=0,isRecording=false;
+function fmtTime(s){ return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+
+function toggleRecord(){ isRecording?stopRecording():startRecording(); }
+async function startRecording(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder=new MediaRecorder(stream);
+    recChunks=[];
+    mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recChunks.push(e.data); };
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(recChunks,{type:'audio/webm'});
+      addAudioClip(blob,`Recording ${fmtTime(recSecs)}`,recSecs);
+      stream.getTracks().forEach(t=>t.stop());
+    };
+    mediaRecorder.start(); isRecording=true; recSecs=0;
+    document.getElementById('rec-btn').textContent='⏹ Stop';
+    document.getElementById('rec-btn').classList.add('recording');
+    document.getElementById('rec-bar').classList.remove('hidden');
+    recTimer=setInterval(()=>{ recSecs++; document.getElementById('rec-timer').textContent=fmtTime(recSecs); },1000);
+  }catch(e){ botMsg('notes','Microphone access denied. Check browser permissions.'); }
+}
+function stopRecording(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive') mediaRecorder.stop();
+  isRecording=false; clearInterval(recTimer);
+  document.getElementById('rec-btn').textContent='⏺ Record';
+  document.getElementById('rec-btn').classList.remove('recording');
+  document.getElementById('rec-bar').classList.add('hidden');
+}
+function handleUpload(e){ const f=e.target.files[0]; if(f){ addAudioClip(f,f.name,null); e.target.value=''; } }
+function addAudioClip(blob,name,dur){
+  if(!activeNote) return;
+  const n=notes.find(x=>x.id===activeNote);
+  if(!n) return;
+  const url=URL.createObjectURL(blob);
+  if(!n.audioClips) n.audioClips=[];
+  n.audioClips.push({id:'a'+Date.now(),name,url,dur,created:Date.now()});
+  saveAll(); renderAudioClips(n); renderNotesList();
+  botMsg('notes',`Audio clip "${name}" attached! Paste a transcript below and I can analyze it 🎵`);
+}
+function renderAudioClips(n){
+  const el=document.getElementById('audio-clips');
+  if(!n.audioClips||!n.audioClips.length){ el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:2px 0">No clips yet — record or upload audio</div>'; return; }
+  el.innerHTML=n.audioClips.map(c=>`
+    <div class="clip-item">
+      <div class="clip-info">
+        <div class="clip-name">🎙 ${c.name}</div>
+        ${c.dur?`<div class="clip-dur">${fmtTime(c.dur)}</div>`:''}
+        <audio src="${c.url}" controls></audio>
+      </div>
+      <button class="clip-tr-btn" onclick="addTranscript('${c.id}')">+ Transcript</button>
+    </div>`).join('');
+}
+function addTranscript(cid){
+  const t=prompt('Paste the transcript for this audio clip:');
+  if(!t) return;
+  const n=notes.find(x=>x.id===activeNote);
+  if(!n) return;
+  const cur=document.getElementById('note-body').value;
+  const updated=cur+(cur?'\n\n':'')+`--- Audio Transcript ---\n${t}`;
+  document.getElementById('note-body').value=updated;
+  n.body=updated; n.updated=Date.now(); saveAll();
+  botMsg('notes','Transcript added! I can now summarize, extract tasks, or answer questions about it 🎵');
+}
+
+// ══════════════════════════════════════════
+// CHAT (shared)
+// ══════════════════════════════════════════
+let typingEls={tracker:null,notes:null};
+
+function botMsg(panel,text){
+  const el=document.getElementById('chat-msgs-'+panel);
+  const d=document.createElement('div'); d.className='msg bot';
+  d.innerHTML=`<div class="msg-bubble">${text.replace(/\n/g,'<br/>')}</div><div class="msg-time">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+  el.appendChild(d); el.scrollTop=el.scrollHeight;
+}
+function userMsg(panel,text){
+  const el=document.getElementById('chat-msgs-'+panel);
+  const d=document.createElement('div'); d.className='msg user';
+  d.innerHTML=`<div class="msg-bubble">${text}</div><div class="msg-time">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+  el.appendChild(d); el.scrollTop=el.scrollHeight;
+}
+function showTyping(panel){
+  const el=document.getElementById('chat-msgs-'+panel);
+  const d=document.createElement('div'); d.className='msg bot';
+  d.innerHTML='<div class="typing-ind"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>';
+  el.appendChild(d); el.scrollTop=el.scrollHeight; typingEls[panel]=d;
+}
+function hideTyping(panel){ if(typingEls[panel]){ typingEls[panel].remove(); typingEls[panel]=null; } }
+function sendChip(btn,panel){ document.getElementById('chat-inp-'+panel).value=btn.textContent; sendChat(panel); }
+function chatKey(e,panel){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendChat(panel); } }
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+
+async function sendChat(panel){
+  const inp=document.getElementById('chat-inp-'+panel);
+  const text=inp.value.trim(); if(!text) return;
+  inp.value=''; inp.style.height='auto';
+  document.getElementById('send-'+panel).disabled=true;
+  userMsg(panel,text);
+  let systemPrompt='', userPrompt=text;
+
+  if(panel==='tracker'){
+    const muniContext = D.munis.map(m=>`
+Municipality: ${m.name} (${m.cgid})
+CSM: ${m.csm||'unassigned'} | Rep: ${m.rep||'unassigned'}
+Products: ${(m.products||[]).join(', ')||'none'}
+ERP: ${m.erp||'unknown'}
+Stage: ${STAGES.filter(s=>m.stages[s]==='done').length}/${STAGES.length} stages complete (current: ${getCurrentStage(m)})
+Kickoff: ${m.kickoff||'TBD'} | Mapping: ${m.mapping||'TBD'} | Launch: ${m.launch||'TBD'}
+Pending actions: ${(m.actions||[]).filter(a=>!a.done).map(a=>a.text).join('; ')||'none'}
+Notes: ${m.notes||'none'}`).join('\n\n---\n');
+    systemPrompt = `You are Mmmm-Bot, a friendly AI assistant for a ClearGov onboarding team. You help CSMs track municipalities through their onboarding pipeline.\n\nCurrent municipality data:\n${muniContext||'No municipalities yet.'}\n\nStages in order: ${STAGES.join(' → ')}\nProducts: OB, CB, DBB, TR, DFR, PB\n\nBe concise and practical. Use bullet points for lists. Add a 🎵 occasionally. Under 200 words unless asked for more.`;
+  } else {
+    const nbNotes=notes.filter(n=>n.notebookId===activeNotebook);
+    const notesCtx=nbNotes.map(n=>`NOTE: "${n.title||'Untitled'}"\n${n.body}${n.tasks?.length?'\nTasks:\n'+n.tasks.map(t=>(t.done?'[x]':'[ ]')+' '+t.text).join('\n'):''}${n.audioClips?.length?`\n[${n.audioClips.length} audio clip(s) attached]`:''}`).join('\n\n---\n\n');
+    const nb=notebooks.find(x=>x.id===activeNotebook);
+    systemPrompt=`You are Mmmm-Bot, a friendly AI assistant. You help users understand their notes and stay organized.\n\nNotebook: "${nb?.name||'General'}"\nNotes:\n${notesCtx||'(No notes yet)'}\n${activeNote?`\nCurrently viewing: "${notes.find(n=>n.id===activeNote)?.title||'Untitled'}"`:''}\n\nBe concise and warm. Bullet points for lists. Add 🎵 occasionally. Under 200 words unless asked for more.`;
+  }
+
+  showTyping(panel);
+  try{
+    const reply=await callClaude(userPrompt,systemPrompt);
+    hideTyping(panel); botMsg(panel,reply);
+  }catch(e){ hideTyping(panel); botMsg(panel,"Oops, hit a snag! Check your connection and try again. 🎵"); }
+  document.getElementById('send-'+panel).disabled=false;
+}
+
+async function callClaude(msg,system=''){
+  const body={model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:msg}]};
+  if(system) body.system=system;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const data=await res.json();
+  if(data.error) throw new Error(data.error.message);
+  return data.content.map(c=>c.text||'').join('');
+}
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.onload=()=>{
+  renderTracker();
+  renderNotebooks();
+  renderNotesList();
+  botMsg('tracker',"Hey! 👋 I'm Mmmm-Bot. I have full visibility into your municipality pipeline. Ask me who needs attention, what's coming up, or anything about your accounts. 🎵");
+  botMsg('notes',"Hey! 👋 Switch to a notebook and I'll help you summarize notes, extract action items, or answer questions about your content. 🎵");
+};
+</script>
+
+
+</body></html>
