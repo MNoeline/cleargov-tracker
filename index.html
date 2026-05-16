@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)file:///C:/Users/mbauman/Downloads/mmmm-bot-unified_19.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearGov Onboarding Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="./index_files/css2" rel="stylesheet">
+<link rel="stylesheet" href="./index_files/tabler-icons.min.css">
+<script src="./index_files/xlsx.full.min.js.download"></script>
+<style>
+  :root{
+    --bg:#F5F4F0;--surface:#FFFFFF;--surface2:#EEECEA;
+    --border:rgba(0,0,0,0.10);--border-mid:rgba(0,0,0,0.18);
+    --text:#1A1916;--text-muted:#6B6960;--text-hint:#9E9D97;
+    --blue:#1A56A4;--blue-bg:#E8F0FB;--blue-text:#0C3D7A;
+    --green:#2A7A4B;--green-bg:#E6F4EC;--green-text:#1A5233;
+    --amber:#B06A10;--amber-bg:#FDF0DC;--amber-text:#7A4A0A;
+    --red:#C0392B;--red-bg:#FDECEB;
+    --radius:10px;--radius-lg:14px;
+    --shadow:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md:0 4px 12px rgba(0,0,0,0.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
+
+  /* ── Header ── */
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .header-brand{display:flex;align-items:center;gap:10px;}
+  .brand-dot{width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;}
+  .brand-name{font-size:16px;font-weight:600;}
+  .brand-name span{color:var(--blue);}
+  .header-actions{display:flex;gap:8px;}
+
+  /* ── SDA Tab Bar ── */
+  .sda-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;gap:4px;overflow-x:auto;position:sticky;top:60px;z-index:40;}
+  .sda-tab{height:44px;padding:0 16px;font-family:'Nunito Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;background:transparent;color:#5a7a5a;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+  .sda-tab:hover{color:var(--text);background:var(--bg);}
+  .sda-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600;}
+  .sda-tab .tab-count{font-size:11px;background:var(--blue-bg);color:var(--blue-text);border-radius:10px;padding:1px 7px;font-weight:600;}
+  .sda-tab.active .tab-count{background:var(--blue);color:#fff;}
+  .sda-tab-all{border-right:1px solid var(--border);margin-right:4px;padding-right:20px;}
+
+  /* ── Buttons ── */
+  .btn{height:36px;padding:0 16px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-mid);background:var(--surface);color:var(--text);transition:all 0.12s;white-space:nowrap;}
+  .btn:hover{background:var(--surface2);}
+  .btn-primary{background:#0f1a0f;color:#22c55e;border-color:#0f1a0f;font-weight:800;}
+  .btn-primary:hover{background:#0C3D7A;border-color:#0C3D7A;}
+  .btn-sm{height:30px;padding:0 12px;font-size:12px;}
+  .btn-danger{color:var(--red);border-color:transparent;background:transparent;}
+  .btn-danger:hover{background:var(--red-bg);}
+
+  /* ── Layout ── */
+  .main{max-width:1100px;margin:0 auto;padding:2rem;}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;box-shadow:var(--shadow);}
+  .stat-label{font-size:12px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+  .stat-value{font-size:28px;font-weight:600;color:var(--text);line-height:1;}
+  .stat-card.highlight{background:var(--blue);border-color:var(--blue);}
+  .stat-card.highlight .stat-label{color:rgba(255,255,255,0.7);}
+  .stat-card.highlight .stat-value{color:#fff;}
+
+  /* ── Toolbar ── */
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .search-wrap{position:relative;flex:1;min-width:180px;}
+  .search-wrap i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-hint);font-size:16px;pointer-events:none;}
+  .search-wrap input{width:100%;height:38px;padding:0 12px 0 36px;border:1px solid var(--border-mid);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;background:var(--surface);color:var(--text);}
+  .search-wrap input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,164,0.1);}
+  select{height:38px;padding:0 12px;border:1px solid var(--border-mid);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--text);cursor:pointer;}
+  select:focus{outline:none;border-color:var(--blue);}
+
+  /* ── Cards ── */
+  .cards-list{display:flex;flex-direction:column;gap:10px;}
+  .muni-card{background:#fff;border:1.5px solid #d0ddd0;border-radius:14px;overflow:hidden;transition:all 0.2s;border-left:4px solid #22c55e;box-shadow:0 2px 8px rgba(26,122,60,0.06);}
+  .muni-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-mid);}
+  .muni-card.completed{border-color:#A8D5BA;background:#FAFFFE;}
+  .muni-card.completed .card-header{background:linear-gradient(90deg,#F0FAF4 0%,#FAFFFE 100%);}
+  .card-header{display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;user-select:none;}
+  .avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+  .muni-card.completed .avatar{background:var(--green-bg)!important;color:var(--green-text)!important;}
+  .card-meta{flex:1;min-width:0;}
+  .card-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .name-display{font-size:15px;font-weight:600;color:var(--text);cursor:text;border-bottom:1px dashed transparent;transition:border-color 0.15s;}
+  .name-display:hover{border-bottom-color:var(--border-mid);}
+  .name-edit{font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;color:var(--text);border:none;border-bottom:2px solid var(--blue);background:transparent;outline:none;min-width:120px;max-width:300px;}
+  .completed-badge{font-size:11px;font-weight:600;background:var(--green-bg);color:var(--green-text);border:1px solid #A8D5BA;padding:2px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+  .current-stage-badge{font-size:11px;font-weight:700;background:#e8f5e9;color:#1a7a3c;border:1px solid #86efac;padding:2px 10px;border-radius:20px;white-space:nowrap;}
+  .card-sub{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .badge-pending{background:var(--amber-bg);color:var(--amber-text);font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;}
+  .data-stars-inline{display:flex;align-items:center;gap:2px;margin-left:2px;}
+  .data-stars-inline .dstar{font-size:13px;cursor:pointer;color:#D4AF37;opacity:0.3;transition:opacity 0.1s;}
+  .data-stars-inline .dstar.lit{opacity:1;}
+  .stage-track{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;flex:2;}
+  .pill{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid;white-space:nowrap;font-weight:500;}
+  .pill-done{background:var(--green-bg);color:var(--green-text);border-color:#A8D5BA;}
+  .pill-active{background:#e8f5e9;color:#1a7a3c;border-color:#86efac;}
+  .pill-todo{background:var(--bg);color:var(--text-hint);border-color:var(--border);}
+  .chevron{font-size:18px;color:var(--text-hint);transition:transform 0.2s;flex-shrink:0;}
+  .chevron.open{transform:rotate(180deg);}
+  .progress-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;}
+  .progress-bar-fill{height:100%;background:linear-gradient(90deg,#0f1a0f,#22c55e);border-radius:2px;transition:width 0.3s;}
+  .muni-card.completed .progress-bar-fill{background:var(--green);}
+
+  /* ── Card body ── */
+  .card-body{display:none;border-top:1px solid var(--border);padding:20px 18px;}
+  .card-body.open{display:block;}
+  .section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-hint);margin-bottom:10px;}
+  .fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field.full{grid-column:1/-1;}
+  .field label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-hint);}
+  .field input,.field select,.field textarea{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border-mid);border-radius:var(--radius);padding:7px 10px;transition:border-color 0.12s;}
+  .field input{height:34px;}
+  .field select{height:34px;cursor:pointer;}
+  .field textarea{resize:vertical;min-height:60px;line-height:1.5;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);background:var(--surface);box-shadow:0 0 0 3px rgba(26,86,164,0.08);}
+
+  /* ── Contacts ── */
+  .contacts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+  .contact-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:8px;}
+  .contact-block-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-hint);margin-bottom:2px;}
+  .star-rating{display:flex;align-items:center;gap:3px;}
+  .star-rating .star{font-size:18px;cursor:pointer;color:#D4AF37;opacity:0.25;transition:opacity 0.1s,transform 0.1s;user-select:none;}
+  .star-rating .star.lit{opacity:1;}
+  .star-rating .star:hover{transform:scale(1.2);}
+  .star-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-hint);margin-bottom:4px;}
+
+  /* ── Products ── */
+  .products-wrap{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+  .product-toggle{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:5px 14px;border-radius:20px;border:1px solid var(--border-mid);background:var(--bg);color:var(--text-muted);cursor:pointer;transition:all 0.12s;}
+  .product-toggle:hover{border-color:var(--blue);color:var(--blue);}
+  .product-toggle.selected{background:var(--blue-bg);color:var(--blue-text);border-color:#9BBCEE;font-weight:600;}
+
+  /* ── Stages ── */
+  .stages-wrap{margin-bottom:20px;}
+  .stages-btns{display:flex;flex-wrap:wrap;gap:7px;}
+  .stage-btn{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border-mid);background:var(--bg);color:var(--text-muted);cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:5px;}
+  .stage-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
+  .stage-btn.done{background:#0f1a0f;color:#22c55e;border-color:#0f1a0f;font-weight:800;}
+  .stage-btn.active{background:var(--blue-bg);color:var(--blue-text);border-color:#9BBCEE;}
+  .twoweek-date{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 14px;background:var(--green-bg);border:1px solid #A8D5BA;border-radius:var(--radius);}
+  .twoweek-date label{font-size:12px;font-weight:600;color:var(--green-text);white-space:nowrap;}
+  .twoweek-date input{height:28px;font-size:13px;font-family:'DM Sans',sans-serif;border:1px solid #A8D5BA;border-radius:6px;padding:0 8px;background:var(--surface);color:var(--text);}
+
+  /* ── Date + notes blocks ── */
+  .date-notes-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px;}
+  .date-notes-block .dn-top{display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+  .date-notes-block .dn-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-hint);white-space:nowrap;}
+  .date-notes-block input[type=date]{height:32px;font-size:13px;font-family:'DM Sans',sans-serif;border:1px solid var(--border-mid);border-radius:var(--radius);padding:0 10px;background:var(--surface);color:var(--text);}
+  .date-notes-block input[type=date]:focus{outline:none;border-color:var(--blue);}
+  .date-notes-block textarea{width:100%;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border-mid);border-radius:var(--radius);padding:8px 10px;resize:vertical;min-height:52px;line-height:1.5;}
+  .date-notes-block textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,164,0.08);}
+
+  /* ── Action items ── */
+  .checklist-section{margin-bottom:16px;}
+  .checklist-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-hint);margin-bottom:8px;}
+  .checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;}
+  .check-item{display:flex;align-items:center;gap:8px;padding:5px 0;}
+  .check-item input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#1a7a3c;flex-shrink:0;}
+  .check-item label{font-size:13px;color:var(--text);cursor:pointer;}
+  .check-item label.done{text-decoration:line-through;color:var(--text-hint);}
+
+  .action-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);}
+  .action-item:last-of-type{border-bottom:none;}
+  .action-cb{width:16px;height:16px;cursor:pointer;accent-color:#1a7a3c;flex-shrink:0;}
+  .action-label{flex:1;font-size:13px;color:var(--text);}
+  .action-label.done{text-decoration:line-through;color:var(--text-hint);}
+  .action-del{background:none;border:none;cursor:pointer;color:var(--text-hint);font-size:16px;padding:2px;transition:color 0.1s;}
+  .action-del:hover{color:var(--red);}
+  .add-action{display:flex;gap:8px;margin-top:10px;}
+  .add-action input{flex:1;height:34px;font-family:'DM Sans',sans-serif;font-size:13px;padding:0 10px;border:1px solid var(--border-mid);border-radius:var(--radius);background:var(--bg);color:var(--text);}
+  .add-action input:focus{outline:none;border-color:var(--blue);background:var(--surface);}
+
+  .card-footer{display:flex;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);margin-top:4px;}
+  .empty{text-align:center;padding:4rem 1rem;color:var(--text-muted);}
+  .empty i{font-size:40px;display:block;margin-bottom:12px;color:var(--text-hint);}
+
+  /* ── Modal ── */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem;}
+  .modal{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);width:540px;max-width:100%;padding:28px;max-height:90vh;overflow-y:auto;}
+  .modal-title{font-size:18px;font-weight:600;margin-bottom:20px;}
+  .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+  .modal-field{display:flex;flex-direction:column;gap:5px;}
+  .modal-field.full{grid-column:1/-1;}
+  .modal-field label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);}
+  .modal-field input,.modal-field select{height:38px;padding:0 12px;font-family:'DM Sans',sans-serif;font-size:14px;border:1px solid var(--border-mid);border-radius:var(--radius);background:var(--bg);color:var(--text);}
+  .modal-field input:focus,.modal-field select:focus{outline:none;border-color:var(--blue);background:var(--surface);box-shadow:0 0 0 3px rgba(26,86,164,0.08);}
+  .modal-section{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-hint);margin:16px 0 10px;grid-column:1/-1;border-top:1px solid var(--border);padding-top:14px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+  .cancel-btn{background:var(--surface2);border:1px solid var(--border-mid);border-radius:var(--radius);color:var(--text);}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:#1A1916;color:#fff;font-size:13px;font-weight:500;padding:12px 20px;border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:300;opacity:0;transform:translateY(8px);transition:opacity 0.2s,transform 0.2s;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+
+  @media(max-width:700px){
+    .main{padding:1rem;}
+    .stage-track{display:none;}
+    .fields-grid,.contacts-grid,.modal-grid,.checklist-grid{grid-template-columns:1fr;}
+    .header,.sda-bar{padding:0 1rem;}
+  }
+
+  /* ── Bot Tab ── */
+  .bot-panel{max-width:1100px;margin:0 auto;padding:2rem;display:none;}
+  .bot-panel.active{display:block;}
+  .main.hidden{display:none;}
+  .bot-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;height:620px;display:flex;flex-direction:column;}
+  .bot-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-width(90deg,var(--blue-bg),var(--surface));}
+  .bot-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+  .bot-avatar{width:38px;height:38px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0;}
+  .bot-title{font-size:15px;font-weight:600;color:var(--text);}
+  .bot-subtitle{font-size:12px;color:var(--text-muted);}
+  .bot-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
+  .bot-msg{display:flex;gap:10px;align-items:flex-start;max-width:85%;}
+  .bot-msg.user{align-self:flex-end;flex-direction:row-reverse;}
+  .bot-msg-bubble{padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.55;}
+  .bot-msg.assistant .bot-msg-bubble{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px 12px 12px 12px;}
+  .bot-msg.user .bot-msg-bubble{background:var(--blue);color:#fff;border-radius:12px 4px 12px 12px;}
+  .bot-msg-avatar{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .bot-msg.assistant .bot-msg-avatar{background:var(--blue);color:#fff;}
+  .bot-msg.user .bot-msg-avatar{background:var(--blue-bg);color:var(--blue-text);font-weight:600;}
+  .bot-typing{display:flex;align-items:center;gap:4px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:4px 12px 12px 12px;width:fit-content;}
+  .bot-typing span{width:7px;height:7px;background:var(--text-hint);border-radius:50%;animation:blink 1.2s infinite;}
+  .bot-typing span:nth-child(2){animation-delay:0.2s;}
+  .bot-typing span:nth-child(3){animation-delay:0.4s;}
+  @keyframes blink{0%,80%,100%{opacity:0.25;}40%{opacity:1;}}
+  .bot-input-row{padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center;}
+  .bot-input-row input{flex:1;height:40px;font-family:'DM Sans',sans-serif;font-size:14px;padding:0 14px;border:1px solid var(--border-mid);border-radius:var(--radius);background:var(--bg);color:var(--text);}
+  .bot-input-row input:focus{outline:none;border-color:var(--blue);background:var(--surface);box-shadow:0 0 0 3px rgba(26,86,164,0.08);}
+  .bot-send{width:40px;height:40px;border-radius:var(--radius);background:var(--blue);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background 0.12s;flex-shrink:0;}
+  .bot-send:hover{background:#0C3D7A;}
+  .bot-send:disabled{background:var(--border-mid);cursor:not-allowed;}
+  .bot-suggestions{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+  .bot-suggestion{font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border-mid);background:var(--surface);color:var(--blue);cursor:pointer;transition:all 0.12s;}
+  .bot-suggestion:hover{background:var(--blue-bg);border-color:#9BBCEE;}
+  .sda-tab.bot-tab{color:var(--amber-text);border-bottom-color:transparent;}
+  .sda-tab.bot-tab.active{color:var(--amber);border-bottom-color:var(--amber);}
+  .sda-tab.bot-tab .tab-count{background:var(--amber-bg);color:var(--amber-text);}
+</style>
+</head>
+<body style="background:#f2f5f2">
+
+<div style="display:flex;flex-direction:row;align-items:stretch;flex-shrink:0;min-height:56px;border-bottom:3px solid #22c55e">
+  <!-- Left bubble accent strip -->
+  <div style="width:84px;background:#0f1a0f;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-right:3px solid #22c55e">
+    <div style="position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(34,197,94,0.20);top:-30px;left:-30px"></div>
+    <div style="position:absolute;width:60px;height:60px;border-radius:50%;background:rgba(180,180,180,0.12);top:40px;left:30px"></div>
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(34,197,94,0.14);top:35%;left:-20px"></div>
+    <div style="position:absolute;width:50px;height:50px;border-radius:50%;background:rgba(200,200,200,0.10);top:55%;left:40px"></div>
+    <div style="position:absolute;width:70px;height:70px;border-radius:50%;background:rgba(34,197,94,0.16);bottom:-10px;left:-10px"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);font-family:&#39;Nunito&#39;,sans-serif;font-size:9px;font-weight:900;color:rgba(34,197,94,0.45);letter-spacing:0.20em;white-space:nowrap;text-transform:uppercase">WORKSPACE</div>
+  </div>
+  <!-- Header main content -->
+  <div style="flex:1;display:flex;align-items:center;gap:14px;padding:0 20px;background:#0f1a0f">
+    <div>
+      <div style="font-family:&#39;Nunito&#39;,sans-serif;font-size:13px;font-weight:900;color:#22c55e;letter-spacing:0.08em">MMMM-BOT</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.4);font-family:&#39;Nunito&#39;,sans-serif;letter-spacing:0.04em">MUNICIPALITY TRACKER</div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <button class="btn" onclick="exportExcel()" style="border-color:rgba(34,197,94,0.4);color:#22c55e;background:rgba(34,197,94,0.1);font-weight:700"><i class="ti ti-file-spreadsheet"></i> Export Excel</button>
+      <button class="btn btn-primary" onclick="openModal()" style="font-weight:800"><i class="ti ti-plus"></i> Add Municipality</button>
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);font-size:11px;color:#22c55e;font-weight:700">
+        <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e"></div>Live
+      </div>
+      <button id="mute-btn" onclick="toggleMute()" title="Sound on — click to mute" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:20px;padding:5px 11px;font-size:15px;cursor:pointer;color:#22c55e;line-height:1">🔔</button>
+      <div style="width:1px;height:32px;background:rgba(255,255,255,0.1)"></div>
+      <svg width="36" height="36" viewBox="0 0 120 120" fill="none" onclick="catMagic()" style="cursor: pointer; transition: transform 0.15s; transform: scale(1);" onmouseover="this.style.transform=&#39;scale(1.15)&#39;" onmouseout="this.style.transform=&#39;scale(1)&#39;">
+  <ellipse cx="60" cy="112" rx="42" ry="14" fill="#e67e22"></ellipse>
+  <ellipse cx="60" cy="68" rx="38" ry="34" fill="#f5c842"></ellipse>
+  <polygon points="28,52 20,22 48,44" fill="#f5c842"></polygon>
+  <polygon points="30,51 24,30 44,45" fill="#e8a830"></polygon>
+  <polygon points="92,52 100,22 72,44" fill="#f5c842"></polygon>
+  <polygon points="90,51 96,30 76,45" fill="#e8a830"></polygon>
+  <ellipse cx="60" cy="48" rx="36" ry="24" fill="#c0392b"></ellipse>
+  <rect x="24" y="58" width="72" height="10" rx="3" fill="#a93226"></rect>
+  <circle cx="68" cy="38" r="8" fill="#e74c3c"></circle>
+  <ellipse cx="22" cy="70" rx="11" ry="13" fill="#0f1a0f" stroke="#22c55e" stroke-width="1.5"></ellipse>
+  <ellipse cx="98" cy="70" rx="11" ry="13" fill="#0f1a0f" stroke="#22c55e" stroke-width="1.5"></ellipse>
+  <path d="M22 60 Q60 36 98 60" fill="none" stroke="#0f1a0f" stroke-width="6" stroke-linecap="round"></path>
+  <path d="M22 60 Q60 37 98 60" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" opacity="0.8"></path>
+  <ellipse cx="46" cy="74" rx="10" ry="8" fill="#22c55e"></ellipse>
+  <ellipse cx="74" cy="74" rx="10" ry="8" fill="#22c55e"></ellipse>
+  <ellipse cx="46" cy="74" rx="3" ry="7" fill="#0f1a0f"></ellipse>
+  <ellipse cx="74" cy="74" rx="3" ry="7" fill="#0f1a0f"></ellipse>
+  <ellipse cx="43" cy="71" rx="2" ry="1.5" fill="white" opacity="0.7"></ellipse>
+  <ellipse cx="71" cy="71" rx="2" ry="1.5" fill="white" opacity="0.7"></ellipse>
+  <ellipse cx="60" cy="86" rx="4" ry="3" fill="#d4556a"></ellipse>
+  <path d="M53 89 Q57 93 60 91 Q63 93 67 89" fill="none" stroke="#b03050" stroke-width="1.5" stroke-linecap="round"></path>
+  <line x1="26" y1="83" x2="50" y2="86" stroke="#a0703a" stroke-width="1" opacity="0.5"></line>
+  <line x1="94" y1="83" x2="70" y2="86" stroke="#a0703a" stroke-width="1" opacity="0.5"></line>
+  <text x="18" y="60" font-size="9" fill="#22c55e" opacity="0.5" font-family="serif">♪</text>
+  <text x="86" y="55" font-size="8" fill="#22c55e" opacity="0.4" font-family="serif">♫</text>
+</svg>
+    </div>
+  </div>
+</div>
+
+<!-- SDA Tab Bar -->
+<nav class="sda-bar" id="sda-bar"><button class="sda-tab sda-tab-all" onclick="setActiveSDA(&#39;All&#39;)">
+    All <span class="tab-count">1</span>
+  </button><button class="sda-tab" onclick="setActiveSDA(&#39;Zach&#39;)">
+      Zach
+    </button><button class="sda-tab" onclick="setActiveSDA(&#39;Tiffany&#39;)">
+      Tiffany
+    </button><button class="sda-tab active" onclick="setActiveSDA(&#39;Ruth&#39;)">
+      Ruth
+    </button><button class="sda-tab" onclick="setActiveSDA(&#39;Michelle&#39;)">
+      Michelle
+    </button><button class="sda-tab" onclick="setActiveSDA(&#39;Kyle&#39;)">
+      Kyle
+    </button><button class="sda-tab" onclick="setActiveSDA(&#39;Emily&#39;)">
+      Emily
+    </button><button class="sda-tab" onclick="setActiveSDA(&#39;Alex&#39;)">
+      Alex
+    </button><button class="sda-tab" onclick="setActiveSDA(&#39;Adam&#39;)">
+      Adam
+    </button><button class="sda-tab bot-tab" onclick="setActiveSDA(&#39;Bot&#39;)">
+    <i class="ti ti-robot" style="font-size:13px"></i> Assistant
+  </button></nav>
+
+<main class="main">
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card highlight"><div class="stat-label">Total — Ruth</div><div class="stat-value">0</div></div>
+    <div class="stat-card"><div class="stat-label">In progress</div><div class="stat-value">0</div></div>
+    <div class="stat-card"><div class="stat-label">Live</div><div class="stat-value">0</div></div>
+    <div class="stat-card"><div class="stat-label">Complete</div><div class="stat-value">0</div></div></div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" id="search" placeholder="Search by name or CGID…" oninput="render()">
+    </div>
+    <select id="filter-stage" onchange="render()">
+      <option value="">All stages</option>
+      <option>Kickoff call</option>
+      <option>Data collection</option>
+      <option>Platform configuration</option>
+      <option>Mapping review call</option>
+      <option>Data Launch</option>
+      <option>2 Week Close</option>
+    </select>
+  </div>
+  <div class="cards-list" id="cards-list"><div class="empty"><i class="ti ti-building"></i><p>No municipalities assigned to Ruth yet</p></div></div>
+</main>
+
+<!-- Bot Panel -->
+<div class="bot-panel" id="bot-panel">
+  <div class="bot-wrap">
+    <div class="bot-header">
+      <div class="bot-avatar"><i class="ti ti-robot" style="font-size:18px"></i></div>
+      <div>
+        <div class="bot-title">ClearGov Onboarding Assistant</div>
+        <div class="bot-subtitle">Ask me anything about your municipalities</div>
+      </div>
+    </div>
+    <div class="bot-messages" id="bot-messages">
+      <div class="bot-msg assistant">
+        <div class="bot-msg-avatar"><i class="ti ti-robot" style="font-size:14px"></i></div>
+        <div>
+          <div class="bot-msg-bubble">Hi! I'm your onboarding assistant. I can see all your municipality data and help you stay on top of things. Try asking me something like:</div>
+          <div class="bot-suggestions" style="margin-top:8px">
+            <button class="bot-suggestion" onclick="sendSuggestion(this)">Which accounts are stuck?</button>
+            <button class="bot-suggestion" onclick="sendSuggestion(this)">Who needs attention this week?</button>
+            <button class="bot-suggestion" onclick="sendSuggestion(this)">What's missing from my accounts?</button>
+            <button class="bot-suggestion" onclick="sendSuggestion(this)">Summarize all municipalities</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bot-input-row">
+      <input type="text" id="bot-input" placeholder="Ask about your municipalities…" onkeydown="if(event.key===&#39;Enter&#39;)sendBotMessage()">
+      <button class="bot-send" id="bot-send-btn" onclick="sendBotMessage()"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal-backdrop" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Add Municipality</div>
+    <div class="modal-grid">
+      <div class="modal-field full"><label>Municipality name *</label><input id="m-name" placeholder="City of Springfield" type="text"></div>
+      <div class="modal-field full"><label>CGID</label><input id="m-cgid" placeholder="CG-00000" type="text"></div>
+      <div class="modal-field"><label>IM</label><input id="m-rep" placeholder="IM name" type="text"></div>
+      <div class="modal-field"><label>SDA</label>
+        <input id="m-csm" placeholder="SDA name" type="text">
+      </div>
+      <div class="modal-field"><label>ERP system</label>
+        <select id="m-erp" onchange="toggleModalErpOther()">
+          <option value="">Select ERP…</option>
+          <option>Tyler Munis</option><option>Tyler New World</option><option>Caselle</option>
+          <option>BS&amp;A</option><option>Incode</option><option>Questica</option>
+          <option>Civic Systems</option><option>QuickBooks</option><option value="Other">Other (type below)</option>
+        </select>
+      </div>
+      <div class="modal-field" id="m-erp-other-wrap" style="display:none"><label>ERP — specify</label><input id="m-erp-other" placeholder="Type ERP name…" type="text"></div>
+      <div class="modal-section">Contacts (up to 3)</div>
+      <div class="modal-field"><label>Contact 1 — Name</label><input id="m-c1name" placeholder="Jane Doe" type="text"></div>
+      <div class="modal-field"><label>Contact 1 — Title</label><input id="m-c1title" placeholder="Finance Director" type="text"></div>
+      <div class="modal-field"><label>Contact 2 — Name</label><input id="m-c2name" placeholder="John Smith" type="text"></div>
+      <div class="modal-field"><label>Contact 2 — Title</label><input id="m-c2title" placeholder="IT Manager" type="text"></div>
+      <div class="modal-field"><label>Contact 3 — Name</label><input id="m-c3name" placeholder="Alex Lee" type="text"></div>
+      <div class="modal-field"><label>Contact 3 — Title</label><input id="m-c3title" placeholder="Budget Analyst" type="text"></div>
+      <div class="modal-section">Key dates</div>
+      <div class="modal-field"><label>Kickoff call date</label><input id="m-kickoff" type="date"></div>
+      <div class="modal-field"><label>Mapping review call date</label><input id="m-mapping" type="date"></div>
+      <div class="modal-field full"><label>Data launch date</label><input id="m-launch" type="date"></div>
+      <div class="modal-section">Products used</div>
+      <div class="modal-field full">
+        <div class="products-wrap" id="modal-products">
+          <button type="button" class="product-toggle" data-val="OB" onclick="toggleModalProduct(this)">OB</button>
+          <button type="button" class="product-toggle" data-val="CB" onclick="toggleModalProduct(this)">CB</button>
+          <button type="button" class="product-toggle" data-val="DBB" onclick="toggleModalProduct(this)">DBB</button>
+          <button type="button" class="product-toggle" data-val="TR" onclick="toggleModalProduct(this)">TR</button>
+          <button type="button" class="product-toggle" data-val="DFR" onclick="toggleModalProduct(this)">DFR</button>
+          <button type="button" class="product-toggle" data-val="PB" onclick="toggleModalProduct(this)">PB</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn cancel-btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNew()"><i class="ti ti-plus"></i> Add Municipality</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STAGES=["Kickoff call","Data collection","Platform configuration","Mapping review call","Data Launch","2 Week Close"];
+const PRODUCTS=["OB","CB","DBB","TR","DFR","PB"];
+const ERP_OPTIONS=["Tyler Munis","Tyler New World","Caselle","BS&A","Incode","Questica","Civic Systems","QuickBooks","Other"];
+const SDAS=["Zach","Tiffany","Ruth","Michelle","Kyle","Emily","Alex","Adam"];
+const CHECKLIST_ITEMS=["Receive data","COA","Kickoff call","Map and load data","Schedule mapping review call","Schedule data launch and review call","Add 2 week post close out"];
+const AVATAR_COLORS=[["#DBEAFE","#1E40AF"],["#D1FAE5","#065F46"],["#EDE9FE","#4C1D95"],["#FEF3C7","#92400E"],["#FCE7F3","#9D174D"],["#DCFCE7","#14532D"],["#FEE2E2","#991B1B"]];
+
+let activeSDA="All";
+
+let data=JSON.parse(localStorage.getItem("cg_onboarding_v5")||"null")||{
+  munis:[
+    {id:1,name:"City of Lakewood",cgid:"CG-10241",
+     contacts:[{name:"Maria Santos",title:"Finance Director",stars:0},{name:"",title:"",stars:0},{name:"",title:"",stars:0}],
+     rep:"",csm:"Michelle",erp:"Tyler Munis",erpOther:"",products:["OB","TR"],
+     kickoff:"2026-02-01",kickoffNotes:"",mapping:"2026-03-15",mappingNotes:"",launch:"2026-06-15",launchNotes:"",twoweekdate:"",
+     dataStars:0,checklist:{},stages:{},actions:[{id:1,text:"Follow up on budget data",done:false}],
+     notes:"Waiting on finance team to provide actuals."},
+    {id:2,name:"Township of Maplewood",cgid:"CG-10255",
+     contacts:[{name:"Derek Hill",title:"IT Manager",stars:0},{name:"",title:"",stars:0},{name:"",title:"",stars:0}],
+     rep:"",csm:"Michelle",erp:"Caselle",erpOther:"",products:["CB"],
+     kickoff:"2026-03-10",kickoffNotes:"",mapping:"",mappingNotes:"",launch:"2026-07-01",launchNotes:"",twoweekdate:"",
+     dataStars:0,checklist:{},stages:{},actions:[],
+     notes:"Small team — schedule training around council meetings."}
+  ],
+  nextId:3
+};
+
+function save(){localStorage.setItem("cg_onboarding_v5",JSON.stringify(data));}
+function getLastDone(m){let l=-1;STAGES.forEach((s,i)=>{if(m.stages[s]==="done")l=i;});return l;}
+function isComplete(m){return m.stages["2 Week Close"]==="done";}
+function getCurrentStage(m){if(isComplete(m))return null;const l=getLastDone(m);if(l<STAGES.length-1)return STAGES[l+1];return null;}
+function getStatus(m){if(isComplete(m))return"Complete";if(m.stages["Data Launch"]==="done")return"Live";if(getLastDone(m)>=0)return"In progress";return"Not started";}
+function pillCls(m,s,i){if(m.stages[s]==="done")return"pill-done";if(i===getLastDone(m)+1)return"pill-active";return"pill-todo";}
+function stageBtnCls(m,s){if(m.stages[s]==="done")return"done";if(STAGES.indexOf(s)===getLastDone(m)+1)return"active";return"";}
+function initials(n){return n.split(" ").map(w=>w[0]).join("").substring(0,2).toUpperCase();}
+function avatarStyle(i){const c=AVATAR_COLORS[i%AVATAR_COLORS.length];return`background:${c[0]};color:${c[1]}`;}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600);}
+function toggleModalProduct(el){el.classList.toggle("selected");}
+function getModalProducts(){return[...document.querySelectorAll("#modal-products .product-toggle.selected")].map(b=>b.dataset.val);}
+function resetModalProducts(){document.querySelectorAll("#modal-products .product-toggle").forEach(b=>b.classList.remove("selected"));}
+function toggleModalErpOther(){const v=document.getElementById("m-erp").value;document.getElementById("m-erp-other-wrap").style.display=v==="Other"?"flex":"none";}
+function starsHtml(val,onClickFn){return`<div class="star-rating">${[1,2,3,4,5].map(i=>`<span class="star${val>=i?" lit":""}" onclick="${onClickFn}(${i})" onmouseover="hoverStars(this,${i})" onmouseleave="resetStarHover(this)">★</span>`).join("")}</div>`;}
+function hoverStars(el,n){const w=el.closest(".star-rating");w.querySelectorAll(".star").forEach((s,i)=>{s.style.opacity=i<n?"1":"0.25";});}
+function resetStarHover(el){const w=el.closest(".star-rating");w.querySelectorAll(".star").forEach(s=>{s.style.opacity="";});}
+
+function setActiveSDA(name){
+  activeSDA=name;
+  if(name==='Bot'){
+    document.getElementById('bot-panel').classList.add('active');
+    document.querySelector('.main').classList.add('hidden');
+  } else {
+    document.getElementById('bot-panel').classList.remove('active');
+    document.querySelector('.main').classList.remove('hidden');
+  }
+  render();
+}
+
+function renderTabs(){
+  const bar=document.getElementById("sda-bar");
+  const allCount=data.munis.length;
+  let html=`<button class="sda-tab sda-tab-all${activeSDA==="All"?" active":""}" onclick="setActiveSDA('All')">
+    All <span class="tab-count">${allCount}</span>
+  </button>`;
+  SDAS.forEach(name=>{
+    const count=data.munis.filter(m=>m.csm===name).length;
+    html+=`<button class="sda-tab${activeSDA===name?" active":""}" onclick="setActiveSDA('${name}')">
+      ${name}${count>0?` <span class="tab-count">${count}</span>`:""}
+    </button>`;
+  });
+  html+=`<button class="sda-tab bot-tab${activeSDA==='Bot'?" active":""}" onclick="setActiveSDA('Bot')">
+    <i class="ti ti-robot" style="font-size:13px"></i> Assistant
+  </button>`;
+  bar.innerHTML=html;
+}
+
+function render(){
+  renderTabs();
+  const q=(document.getElementById("search").value||"").toLowerCase();
+  const fs=document.getElementById("filter-stage").value;
+
+  let munis=data.munis.filter(m=>{
+    if(activeSDA!=="All"&&m.csm!==activeSDA)return false;
+    if(q&&!m.name.toLowerCase().includes(q)&&!(m.cgid||"").toLowerCase().includes(q))return false;
+    if(fs){const i=STAGES.indexOf(fs);const l=getLastDone(m);if(!(m.stages[fs]==="done"||(i===l+1)))return false;}
+    return true;
+  });
+
+  // Stats for current view
+  const viewTotal=munis.length;
+  const viewLive=munis.filter(m=>m.stages["Data Launch"]==="done"&&!isComplete(m)).length;
+  const viewInProg=munis.filter(m=>getLastDone(m)>=0&&!m.stages["Data Launch"]).length;
+  const viewComplete=munis.filter(m=>isComplete(m)).length;
+  document.getElementById("stats-row").innerHTML=`
+    <div class="stat-card highlight"><div class="stat-label">${activeSDA==="All"?"Total":"Total — "+activeSDA}</div><div class="stat-value">${viewTotal}</div></div>
+    <div class="stat-card"><div class="stat-label">In progress</div><div class="stat-value">${viewInProg}</div></div>
+    <div class="stat-card"><div class="stat-label">Live</div><div class="stat-value">${viewLive}</div></div>
+    <div class="stat-card"><div class="stat-label">Complete</div><div class="stat-value">${viewComplete}</div></div>`;
+
+  const container=document.getElementById("cards-list");
+  if(!munis.length){container.innerHTML=`<div class="empty"><i class="ti ti-building"></i><p>${activeSDA==="All"?"No municipalities found":"No municipalities assigned to "+activeSDA+" yet"}</p></div>`;return;}
+
+  container.innerHTML=munis.map(m=>{
+    const ci=data.munis.indexOf(m);
+    const open=m._open?"open":"";
+    const complete=isComplete(m);
+    const currentStage=getCurrentStage(m);
+    const pending=m.actions.filter(a=>!a.done).length;
+    const checkDone=CHECKLIST_ITEMS.filter(c=>(m.checklist||{})[c]).length;
+    const doneCnt=STAGES.filter(s=>m.stages[s]==="done").length;
+    const pct=Math.round((doneCnt/STAGES.length)*100);
+    const contacts=m.contacts||[{name:"",title:"",stars:0},{name:"",title:"",stars:0},{name:"",title:"",stars:0}];
+    const prods=(m.products||[]).join(", ");
+    const twoWeekDone=m.stages["2 Week Close"]==="done";
+    const erpDisplay=m.erp==="Other"?(m.erpOther||"Other"):m.erp;
+    const dsHtml=[1,2,3,4,5].map(i=>`<span class="dstar${(m.dataStars||0)>=i?" lit":""}" onclick="event.stopPropagation();setDataStars(${m.id},${i})">★</span>`).join("");
+
+    return`<div class="muni-card${complete?" completed":""}" id="card-${m.id}">
+      <div class="card-header" onclick="toggleCard(${m.id})">
+        <div class="avatar" style="${complete?"":avatarStyle(ci)}">${complete?'<i class="ti ti-check" style="font-size:18px"></i>':initials(m.name)}</div>
+        <div class="card-meta">
+          <div class="card-name-row">
+            <span class="name-display" id="name-disp-${m.id}" onclick="event.stopPropagation();startEditName(${m.id})">${m.name}</span>
+            ${complete?`<span class="completed-badge"><i class="ti ti-circle-check" style="font-size:12px"></i> Onboarding complete</span>`:currentStage?`<span class="current-stage-badge">${currentStage}</span>`:""}
+          </div>
+          <div class="card-sub">
+            <span>${m.cgid||"No CGID"}</span>
+            ${m.rep?`<span>·</span><span>IM: ${m.rep}</span>`:""}
+            <span>·</span><span>SDA: ${m.csm||"—"}</span>
+            ${erpDisplay?`<span>·</span><span>${erpDisplay}</span>`:""}
+            ${prods?`<span>·</span><span>${prods}</span>`:""}
+            <div class="data-stars-inline">${dsHtml}</div>
+            ${pending||checkDone<CHECKLIST_ITEMS.length?`<span class="badge-pending">${checkDone}/${CHECKLIST_ITEMS.length} steps${pending?" · "+pending+" action"+(pending>1?"s":"")+" pending":""}</span>`:""}
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="stage-track">${STAGES.map((s,i)=>`<span class="pill ${pillCls(m,s,i)}">${s}</span>`).join("")}</div>
+        <i class="ti ti-chevron-down chevron ${open}"></i>
+      </div>
+      <div class="card-body ${open}">
+
+        <div class="section-label">Contacts</div>
+        <div class="contacts-grid">
+          ${[0,1,2].map(idx=>{
+            const c=contacts[idx]||{name:"",title:"",stars:0};
+            return`<div class="contact-block">
+              <div class="contact-block-label">Contact ${idx+1}</div>
+              <div class="field"><label>Name</label><input value="${c.name||""}" onchange="updContact(${m.id},${idx},'name',this.value)" placeholder="Full name"></div>
+              <div class="field"><label>Title</label><input value="${c.title||""}" onchange="updContact(${m.id},${idx},'title',this.value)" placeholder="Job title"></div>
+              <div>${starsHtml(c.stars||0,`setContactStars_${m.id}_${idx}`)}</div>
+            </div>`;
+          }).join("")}
+        </div>
+
+        <hr class="divider">
+        <div class="section-label">Account details</div>
+        <div class="fields-grid">
+          <div class="field"><label>IM</label><input value="${m.rep||""}" onchange="upd(${m.id},'rep',this.value)" placeholder="Rep name"></div>
+          <div class="field"><label>SDA</label>
+            <input value="${m.csm||''}" onchange="upd(${m.id},'csm',this.value);save();render();" placeholder="SDA name">
+          </div>
+          <div class="field"><label>CGID</label><input value="${m.cgid||""}" onchange="upd(${m.id},'cgid',this.value)" placeholder="CG-00000"></div>
+          <div class="field"><label>ERP system</label>
+            <select onchange="handleErpChange(${m.id},this.value)">
+              <option value="">Select ERP…</option>
+              ${ERP_OPTIONS.map(e=>`<option${m.erp===e?" selected":""}>${e}</option>`).join("")}
+            </select>
+          </div>
+          ${m.erp==="Other"?`<div class="field full"><label>ERP — specify</label><input value="${m.erpOther||""}" onchange="upd(${m.id},'erpOther',this.value)" placeholder="Type ERP name…"></div>`:""}
+          <div class="field full"><label>Products used</label>
+            <div class="products-wrap">
+              ${PRODUCTS.map(p=>`<button type="button" class="product-toggle${(m.products||[]).includes(p)?" selected":""}" onclick="toggleProduct(${m.id},'${p}',this)">${p}</button>`).join("")}
+            </div>
+          </div>
+          <div class="field full"><div class="star-label">Data / tier difficulty</div>${starsHtml(m.dataStars||0,`setDataStars_card_${m.id}`)}</div>
+        </div>
+
+        <hr class="divider">
+        <div class="section-label">Key dates &amp; notes</div>
+        <div class="date-notes-block">
+          <div class="dn-top"><div class="dn-label"><i class="ti ti-phone" style="font-size:13px;margin-right:4px"></i>Kickoff call</div><input type="date" value="${m.kickoff||""}" onchange="upd(${m.id},'kickoff',this.value)"></div>
+          <textarea placeholder="Notes from kickoff call…" onchange="upd(${m.id},'kickoffNotes',this.value)">${m.kickoffNotes||""}</textarea>
+        </div>
+        <div class="date-notes-block">
+          <div class="dn-top"><div class="dn-label"><i class="ti ti-map" style="font-size:13px;margin-right:4px"></i>Mapping review call</div><input type="date" value="${m.mapping||""}" onchange="upd(${m.id},'mapping',this.value)"></div>
+          <textarea placeholder="Notes from mapping review call…" onchange="upd(${m.id},'mappingNotes',this.value)">${m.mappingNotes||""}</textarea>
+        </div>
+        <div class="date-notes-block">
+          <div class="dn-top"><div class="dn-label"><i class="ti ti-rocket" style="font-size:13px;margin-right:4px"></i>Data launch</div><input type="date" value="${m.launch||""}" onchange="upd(${m.id},'launch',this.value)"></div>
+          <textarea placeholder="Notes from data launch…" onchange="upd(${m.id},'launchNotes',this.value)">${m.launchNotes||""}</textarea>
+        </div>
+        <div class="field" style="margin-bottom:20px;margin-top:4px">
+          <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-hint);margin-bottom:4px;display:block">General notes / next steps</label>
+          <textarea style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--border-mid);border-radius:var(--radius);background:var(--bg);resize:vertical;min-height:56px;line-height:1.5;color:var(--text);" onchange="upd(${m.id},'notes',this.value)" placeholder="Add general notes…">${m.notes||""}</textarea>
+        </div>
+
+        <hr class="divider">
+        <div class="checklist-section">
+          <div class="checklist-label">Onboarding checklist — ${checkDone}/${CHECKLIST_ITEMS.length} complete</div>
+          <div class="checklist-grid">
+            ${CHECKLIST_ITEMS.map(item=>{
+              const checked=(m.checklist||{})[item]||false;
+              const safeId=`chk_${m.id}_${item.replace(/\s+/g,'_')}`;
+              return`<div class="check-item">
+                <input type="checkbox" id="${safeId}" ${checked?"checked":""} onchange="toggleChecklist(${m.id},'${item.replace(/'/g,"\\'")}',this.checked)">
+                <label for="${safeId}" class="${checked?"done":""}">${item}</label>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <hr class="divider">
+        <div class="stages-wrap">
+          <div class="section-label">Onboarding stages — click to mark complete</div>
+          <div class="stages-btns">
+            ${STAGES.map(s=>{
+              if(s==="2 Week Close"){return`<div><button class="stage-btn ${stageBtnCls(m,s)}" onclick="toggleStage(${m.id},'${s}')">${m.stages[s]==="done"?'<i class="ti ti-check" style="font-size:12px"></i>':""} 2 Week Close</button>${twoWeekDone?`<div class="twoweek-date"><label><i class="ti ti-calendar" style="font-size:13px;margin-right:4px"></i>Close date</label><input type="date" value="${m.twoweekdate||""}" onchange="upd(${m.id},'twoweekdate',this.value)"></div>`:""}</div>`;}
+              return`<button class="stage-btn ${stageBtnCls(m,s)}" onclick="toggleStage(${m.id},'${s}')">${m.stages[s]==="done"?'<i class="ti ti-check" style="font-size:12px"></i>':""} ${s}</button>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <hr class="divider">
+        <div class="section-label">Additional action items</div>
+        ${m.actions.map(a=>`<div class="action-item">
+          <input type="checkbox" class="action-cb" ${a.done?"checked":""} onchange="toggleAction(${m.id},${a.id},this.checked)">
+          <span class="action-label ${a.done?"done":""}">${a.text}</span>
+          <button class="action-del" onclick="delAction(${m.id},${a.id})"><i class="ti ti-trash"></i></button>
+        </div>`).join("")}
+        <div class="add-action">
+          <input type="text" placeholder="Add an action item…" id="ai-${m.id}" onkeydown="if(event.key==='Enter')addAction(${m.id})">
+          <button class="btn btn-sm" onclick="addAction(${m.id})"><i class="ti ti-plus"></i> Add</button>
+        </div>
+
+        <div class="card-footer">
+          <hr style="border:none;border-top:1px solid #eef0f4;margin:16px 0">
+        <div style="font-size:10px;font-family:'Nunito',sans-serif;color:#8aaa8a;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;font-weight:800">📝 Notes &amp; Audio</div>
+        <textarea style="width:100%;font-family:'Nunito Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid #d0ddd0;border-radius:8px;resize:vertical;min-height:56px;line-height:1.5;color:#1a2e1a;margin-bottom:10px;outline:none" placeholder="Meeting notes for this municipality…" onchange="upd(${m.id},'cardNotes',this.value)">${m.cardNotes||''}</textarea>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+          <button id="mrec-${m.id}" onclick="toggleMuniRecord(${m.id})" style="display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;font-size:12px;cursor:pointer;border:1px solid rgba(231,76,60,0.4);color:#e74c3c;background:transparent;font-family:'Nunito Sans',sans-serif;font-weight:700">⏺ Record Audio</button>
+          <label style="display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;font-size:12px;cursor:pointer;border:1px solid #d0ddd0;color:#5a7a5a;background:transparent;font-family:'Nunito Sans',sans-serif;font-weight:700">↑ Upload Audio<input type="file" accept="audio/*" style="display:none" onchange="handleMuniUpload(event,${m.id})"/></label>
+        </div>
+        <div id="muni-clips-${m.id}">
+          ${(m.audioClips||[]).length===0?'<div style="font-size:12px;color:#aaa;padding:2px 0">No audio clips yet</div>':
+            (m.audioClips||[]).map((c,ci)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f9fafb;border-radius:6px;border:1px solid #d0ddd0;margin-bottom:5px"><div style="flex:1;min-width:0"><div style="font-size:11px;color:#555;margin-bottom:2px">🎙 ${c.name}</div><audio src="${c.url}" controls style="width:100%;height:24px;margin-top:3px"></audio></div><button onclick="deleteMuniClip(${m.id},${ci})" style="color:#ccc;cursor:pointer;font-size:12px;background:none;border:none" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#ccc'">✕</button></div>`).join('')}
+        </div>
+        <hr style="border:none;border-top:1px solid #eef0f4;margin:16px 0">
+        <button class="btn btn-sm btn-danger" onclick="delMuni(${m.id})"><i class="ti ti-trash"></i> Remove municipality</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Attach star functions dynamically
+  data.munis.forEach(m=>{
+    window[`setDataStars_card_${m.id}`]=function(v){setDataStars(m.id,v);};
+    [0,1,2].forEach(idx=>{
+      window[`setContactStars_${m.id}_${idx}`]=function(v){updContact(m.id,idx,'stars',v);save();render();data.munis.find(x=>x.id===m.id)._open=true;render();};
+    });
+  });
+}
+
+function startEditName(id){
+  const m=data.munis.find(x=>x.id===id);
+  const disp=document.getElementById("name-disp-"+id);
+  const inp=document.createElement("input");
+  inp.className="name-edit";inp.value=m.name;
+  disp.replaceWith(inp);inp.focus();inp.select();
+  function commit(){const v=inp.value.trim()||m.name;m.name=v;save();render();data.munis.find(x=>x.id===id)._open=true;render();}
+  inp.addEventListener("blur",commit);
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=m.name;inp.blur();}});
+}
+
+function toggleCard(id){const m=data.munis.find(x=>x.id===id);m._open=!m._open;render();}
+function upd(id,f,v){const m=data.munis.find(x=>x.id===id);m[f]=v;save();}
+function updContact(id,idx,field,val){const m=data.munis.find(x=>x.id===id);if(!m.contacts)m.contacts=[{name:"",title:"",stars:0},{name:"",title:"",stars:0},{name:"",title:"",stars:0}];m.contacts[idx][field]=val;save();}
+function handleErpChange(id,val){const m=data.munis.find(x=>x.id===id);m.erp=val;if(val!=="Other")m.erpOther="";save();m._open=true;render();}
+function toggleProduct(id,prod,el){const m=data.munis.find(x=>x.id===id);if(!m.products)m.products=[];const i=m.products.indexOf(prod);if(i>=0)m.products.splice(i,1);else m.products.push(prod);el.classList.toggle("selected");save();}
+function setDataStars(id,v){const m=data.munis.find(x=>x.id===id);m.dataStars=m.dataStars===v?0:v;save();m._open=true;render();}
+function toggleChecklist(id,item,done){const m=data.munis.find(x=>x.id===id);if(!m.checklist)m.checklist={};m.checklist[item]=done;save();m._open=true;render();}
+function toggleStage(id,s){const m=data.munis.find(x=>x.id===id);m.stages[s]=m.stages[s]==="done"?"":"done";save();render();}
+function toggleAction(id,aid,done){const m=data.munis.find(x=>x.id===id);m.actions.find(x=>x.id===aid).done=done;save();render();}
+function delAction(id,aid){const m=data.munis.find(x=>x.id===id);m.actions=m.actions.filter(x=>x.id!==aid);save();render();}
+function addAction(id){const inp=document.getElementById("ai-"+id);const txt=inp.value.trim();if(!txt)return;const m=data.munis.find(x=>x.id===id);m.actions.push({id:Date.now(),text:txt,done:false});save();render();data.munis.find(x=>x.id===id)._open=true;render();}
+function delMuni(id){if(!confirm("Remove this municipality?"))return;data.munis=data.munis.filter(x=>x.id!==id);save();render();}
+function openModal(){document.getElementById("modal").style.display="flex";}
+function closeModal(){
+  document.getElementById("modal").style.display="none";resetModalProducts();
+  ["m-name","m-cgid","m-rep","m-c1name","m-c1title","m-c2name","m-c2title","m-c3name","m-c3title","m-kickoff","m-mapping","m-launch","m-erp-other"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  document.getElementById("m-erp").value="";document.getElementById("m-csm").value="";
+  document.getElementById("m-erp-other-wrap").style.display="none";
+}
+function saveNew(){
+  const name=document.getElementById("m-name").value.trim();
+  if(!name){alert("Please enter a municipality name.");return;}
+  const erpVal=document.getElementById("m-erp").value;
+  const csmVal=document.getElementById("m-csm").value;
+  data.munis.push({
+    id:data.nextId++,name,
+    cgid:document.getElementById("m-cgid").value.trim(),
+    rep:document.getElementById("m-rep").value.trim(),
+    csm:csmVal,erp:erpVal,
+    erpOther:erpVal==="Other"?document.getElementById("m-erp-other").value.trim():"",
+    contacts:[
+      {name:document.getElementById("m-c1name").value.trim(),title:document.getElementById("m-c1title").value.trim(),stars:0},
+      {name:document.getElementById("m-c2name").value.trim(),title:document.getElementById("m-c2title").value.trim(),stars:0},
+      {name:document.getElementById("m-c3name").value.trim(),title:document.getElementById("m-c3title").value.trim(),stars:0}
+    ],
+    products:getModalProducts(),
+    kickoff:document.getElementById("m-kickoff").value,kickoffNotes:"",
+    mapping:document.getElementById("m-mapping").value,mappingNotes:"",
+    launch:document.getElementById("m-launch").value,launchNotes:"",
+    twoweekdate:"",dataStars:0,checklist:{},stages:{},actions:[],notes:"",_open:true
+  });
+  if(csmVal)activeSDA=csmVal;
+  save();closeModal();render();showToast("Municipality added!");
+}
+
+function exportExcel(){
+  const wb=XLSX.utils.book_new();
+  const munis=activeSDA==="All"?data.munis:data.munis.filter(m=>m.csm===activeSDA);
+  const s1=[["Municipality","CGID","IM","SDA","ERP","Products","Data Stars",
+    "Contact 1","Title 1","Stars 1","Contact 2","Title 2","Stars 2","Contact 3","Title 3","Stars 3",
+    "Kickoff Date","Kickoff Notes","Mapping Date","Mapping Notes","Launch Date","Launch Notes","2 Week Close Date",
+    ...CHECKLIST_ITEMS,...STAGES,"Stages Done","Status","Additional Actions","General Notes"]];
+  munis.forEach(m=>{
+    const c=m.contacts||[];
+    const done=STAGES.filter(s=>m.stages[s]==="done").length;
+    const erpDisplay=m.erp==="Other"?(m.erpOther||"Other"):m.erp;
+    s1.push([m.name,m.cgid,m.rep,m.csm,erpDisplay,(m.products||[]).join(", "),m.dataStars||0,
+      (c[0]&&c[0].name)||"",(c[0]&&c[0].title)||"",c[0]&&c[0].stars||0,
+      (c[1]&&c[1].name)||"",(c[1]&&c[1].title)||"",c[1]&&c[1].stars||0,
+      (c[2]&&c[2].name)||"",(c[2]&&c[2].title)||"",c[2]&&c[2].stars||0,
+      m.kickoff||"",m.kickoffNotes||"",m.mapping||"",m.mappingNotes||"",
+      m.launch||"",m.launchNotes||"",m.twoweekdate||"",
+      ...CHECKLIST_ITEMS.map(ci=>(m.checklist||{})[ci]?"✓":""),
+      ...STAGES.map(s=>m.stages[s]==="done"?"✓":""),
+      done+"/"+STAGES.length,getStatus(m),
+      m.actions.filter(a=>!a.done).map(a=>a.text).join("; "),
+      m.notes||""]);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(s1);
+  XLSX.utils.book_append_sheet(wb,ws,activeSDA==="All"?"All Municipalities":activeSDA);
+  XLSX.writeFile(wb,`ClearGov_${activeSDA==="All"?"All":activeSDA}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast("Excel downloaded!");
+}
+
+render();
+
+// ── Bot ──
+let botHistory=[];
+
+function buildContext(){
+  const summary=data.munis.map(m=>{
+    const stages=Object.keys(m.stages).filter(s=>m.stages[s]==="done");
+    const lastDone=STAGES.indexOf(stages[stages.length-1]);
+    const currentStage=lastDone<STAGES.length-1?STAGES[lastDone+1]:"Complete";
+    const checklist=CHECKLIST_ITEMS.filter(c=>(m.checklist||{})[c]);
+    const pending=m.actions.filter(a=>!a.done).map(a=>a.text);
+    const contacts=(m.contacts||[]).filter(c=>c.name).map(c=>`${c.name} (${c.title||"no title"}${c.stars>0?", "+c.stars+" attention stars":""})`).join(", ");
+    return `- ${m.name} | CGID: ${m.cgid||"none"} | SDA: ${m.csm||"unassigned"} | IM: ${m.rep||"none"} | ERP: ${m.erp==="Other"?(m.erpOther||"Other"):m.erp||"none"} | Products: ${(m.products||[]).join(", ")||"none"} | Data stars: ${m.dataStars||0}/5 | Current stage: ${currentStage} | Stages done: ${stages.join(", ")||"none"} | Checklist: ${checklist.length}/${CHECKLIST_ITEMS.length} complete | Contacts: ${contacts||"none"} | Pending actions: ${pending.join("; ")||"none"} | Notes: ${m.notes||"none"}`;
+  }).join("\n");
+  return `You are a helpful onboarding assistant for ClearGov, a government financial transparency platform. You help SDAs (onboarding specialists) manage their municipality onboarding pipeline.
+
+Current date: ${new Date().toLocaleDateString()}
+Total municipalities: ${data.munis.length}
+
+MUNICIPALITY DATA:
+${summary}
+
+ONBOARDING STAGES IN ORDER: ${STAGES.join(" → ")}
+CHECKLIST ITEMS: ${CHECKLIST_ITEMS.join(", ")}
+
+You have full visibility into all municipality data above. Be concise, helpful, and specific. When asked about attention or stuck accounts, look at data stars, pending actions, incomplete checklists, and stage progress. Format lists clearly. If asked to write notes, write professional but friendly onboarding notes.`;
+}
+
+function appendMsg(role,text){
+  const msgs=document.getElementById("bot-messages");
+  const div=document.createElement("div");
+  div.className=`bot-msg ${role}`;
+  const avatarIcon=role==="assistant"?'<i class="ti ti-robot" style="font-size:14px"></i>':'Me';
+  div.innerHTML=`<div class="bot-msg-avatar">${avatarIcon}</div><div class="bot-msg-bubble">${text.replace(/\n/g,"<br>")}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function showTyping(){
+  const msgs=document.getElementById("bot-messages");
+  const div=document.createElement("div");
+  div.className="bot-msg assistant";div.id="bot-typing-indicator";
+  div.innerHTML=`<div class="bot-msg-avatar"><i class="ti ti-robot" style="font-size:14px"></i></div><div class="bot-typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function removeTyping(){const t=document.getElementById("bot-typing-indicator");if(t)t.remove();}
+
+function sendSuggestion(el){
+  document.getElementById("bot-input").value=el.textContent;
+  sendBotMessage();
+}
+
+async function sendBotMessage(){
+  const inp=document.getElementById("bot-input");
+  const text=inp.value.trim();if(!text)return;
+  inp.value="";
+  document.getElementById("bot-send-btn").disabled=true;
+  appendMsg("user",text);
+  botHistory.push({role:"user",content:text});
+  showTyping();
+  try{
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:buildContext(),
+        messages:botHistory
+      })
+    });
+    const d=await resp.json();
+    removeTyping();
+    const reply=d.content&&d.content[0]&&d.content[0].text?d.content[0].text:"Sorry, I couldn't get a response. Please try again.";
+    botHistory.push({role:"assistant",content:reply});
+    appendMsg("assistant",reply);
+  }catch(e){
+    removeTyping();
+    appendMsg("assistant","Sorry, I had trouble connecting. Please check your internet and try again.");
+  }
+  document.getElementById("bot-send-btn").disabled=false;
+  document.getElementById("bot-input").focus();
+}
+
+</script>
+
+<script>
+// ══ SOUND SYSTEM — Wind Chime Edition 🎐 ══
+const AudioCtx2 = window.AudioContext || window.webkitAudioContext;
+let audioCtx2 = null;
+let soundMuted = localStorage.getItem('mmmmbot_muted') === 'true';
+
+function getAudioCtx2(){
+  if(!audioCtx2) audioCtx2 = new AudioCtx2();
+  return audioCtx2;
+}
+function canPlay(){ return !soundMuted; }
+
+function toggleMute(){
+  soundMuted = !soundMuted;
+  localStorage.setItem('mmmmbot_muted', soundMuted);
+  const btn = document.getElementById('mute-btn');
+  if(btn){ btn.textContent = soundMuted?'🔇':'🔔'; btn.style.opacity = soundMuted?'0.5':'1'; }
+}
+
+function chime(freq, delay=0, vol=0.18){
+  if(!canPlay()) return;
+  try{
+    const ctx=getAudioCtx2(); const t=ctx.currentTime+delay;
+    const o1=ctx.createOscillator(),g1=ctx.createGain();
+    o1.connect(g1);g1.connect(ctx.destination);
+    o1.type='sine'; o1.frequency.setValueAtTime(freq,t);
+    g1.gain.setValueAtTime(vol,t); g1.gain.exponentialRampToValueAtTime(0.001,t+1.8);
+    o1.start(t); o1.stop(t+2.0);
+    const o2=ctx.createOscillator(),g2=ctx.createGain();
+    o2.connect(g2);g2.connect(ctx.destination);
+    o2.type='triangle'; o2.frequency.setValueAtTime(freq*2,t);
+    g2.gain.setValueAtTime(vol*0.12,t); g2.gain.exponentialRampToValueAtTime(0.001,t+0.9);
+    o2.start(t); o2.stop(t+1.0);
+  }catch(e){}
+}
+
+function sparkle(freqs,gap=0.12){ freqs.forEach((f,i)=>chime(f,i*gap,0.15)); }
+
+function btnPop(){ if(!canPlay())return; const f=[1047,1175,1319][Math.floor(Math.random()*3)]; chime(f,0,0.13); }
+function successPop(){ if(!canPlay())return; sparkle([1047,1319,1568,1760,2093,2349],0.10); }
+
+function catMagic(){
+  if(!canPlay())return;
+  const run=[1047,1319,1568,1760,2093,2349,2637,2349,2093,1760,1568,1319,1047];
+  run.forEach((f,i)=>chime(f,i*0.09,0.13));
+  setTimeout(()=>{
+    if(!canPlay())return;
+    try{
+      const ctx=getAudioCtx2(); const t=ctx.currentTime;
+      const carrier=ctx.createOscillator();
+      carrier.type='sawtooth';
+      carrier.frequency.setValueAtTime(550,t);
+      carrier.frequency.linearRampToValueAtTime(900,t+0.18);
+      carrier.frequency.linearRampToValueAtTime(550,t+0.55);
+      carrier.frequency.linearRampToValueAtTime(400,t+0.80);
+      const f1=ctx.createBiquadFilter(); f1.type='bandpass'; f1.frequency.setValueAtTime(2800,t); f1.frequency.linearRampToValueAtTime(900,t+0.80); f1.Q.setValueAtTime(6,t);
+      const g1=ctx.createGain(); g1.gain.setValueAtTime(0.001,t); g1.gain.linearRampToValueAtTime(3.5,t+0.05); g1.gain.exponentialRampToValueAtTime(0.001,t+0.82);
+      const f2=ctx.createBiquadFilter(); f2.type='bandpass'; f2.frequency.setValueAtTime(900,t); f2.frequency.linearRampToValueAtTime(500,t+0.80); f2.Q.setValueAtTime(5,t);
+      const g2=ctx.createGain(); g2.gain.setValueAtTime(0.001,t); g2.gain.linearRampToValueAtTime(4.0,t+0.50); g2.gain.exponentialRampToValueAtTime(0.001,t+0.82);
+      const master=ctx.createGain(); master.gain.setValueAtTime(0.22,t); master.gain.exponentialRampToValueAtTime(0.001,t+0.85); master.connect(ctx.destination);
+      carrier.connect(f1);f1.connect(g1);g1.connect(master);
+      carrier.connect(f2);f2.connect(g2);g2.connect(master);
+      const lfo=ctx.createOscillator(),lfoG=ctx.createGain();
+      lfo.frequency.setValueAtTime(6,t); lfoG.gain.setValueAtTime(22,t); lfo.connect(lfoG); lfoG.connect(carrier.frequency);
+      carrier.start(t);carrier.stop(t+0.87);lfo.start(t);lfo.stop(t+0.87);
+    }catch(e){}
+  }, run.length*0.09*1000+400);
+}
+
+const SDA_SOUNDS={
+  'All':()=>sparkle([1047,1319,1568],0.13),
+  'Zach':()=>sparkle([784,988,1175],0.16),
+  'Tiffany':()=>sparkle([1568,1760,2093,2349],0.10),
+  'Ruth':()=>sparkle([1175,1319,1568,1760],0.12),
+  'Michelle':()=>sparkle([1319,1568,1319,1047],0.11),
+  'Kyle':()=>sparkle([988,1175,988],0.14),
+  'Emily':()=>sparkle([1047,1319,1568,1760,2093],0.09),
+  'Alex':()=>sparkle([880,1047,1175,1319],0.13),
+  'Adam':()=>sparkle([784,880,1047],0.15),
+};
+
+// Hook into SDA tab clicks
+document.addEventListener('DOMContentLoaded',()=>{
+  if(soundMuted){ const b=document.getElementById('mute-btn'); if(b){b.textContent='🔇';b.style.opacity='0.5';} }
+  // Patch setActiveSDA to play sounds
+  const origSetActiveSDA = window.setActiveSDA;
+  if(origSetActiveSDA){
+    window.setActiveSDA = function(name){
+      const fn=SDA_SOUNDS[name]; if(fn) fn();
+      origSetActiveSDA(name);
+    };
+  }
+  // Patch toggleStage for success sound
+  const origToggleStage = window.toggleStage;
+  if(origToggleStage){
+    window.toggleStage = function(id,s){
+      const m=data.munis.find(x=>x.id===id);
+      const wasDone = m&&m.stages&&m.stages[s]==='done';
+      origToggleStage(id,s);
+      if(!wasDone) successPop(); else btnPop();
+    };
+  }
+  // Patch saveNew for success sound
+  const origSaveNew = window.saveNew;
+  if(origSaveNew){
+    window.saveNew = function(){
+      origSaveNew();
+      successPop();
+    };
+  }
+});
+</script>
+
+<script>
+// Per-municipality audio recording
+let muniRecorders={};
+function fmtT(s){return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+function toggleMuniRecord(id){ if(muniRecorders[id]&&muniRecorders[id].active) stopMuniRec(id); else startMuniRec(id); }
+async function startMuniRec(id){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const mr=new MediaRecorder(stream); const chunks=[]; let secs=0;
+    mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+    mr.onstop=()=>{
+      const blob=new Blob(chunks,{type:'audio/webm'});
+      const url=URL.createObjectURL(blob);
+      const m=data.munis.find(x=>x.id===id); if(!m)return;
+      if(!m.audioClips)m.audioClips=[];
+      m.audioClips.push({id:'a'+Date.now(),name:`Recording ${fmtT(secs)}`,url,dur:secs,created:Date.now()});
+      save();render(); stream.getTracks().forEach(t=>t.stop());
+    };
+    mr.start();
+    const timer=setInterval(()=>secs++,1000);
+    muniRecorders[id]={active:true,mr,timer};
+    const btn=document.getElementById(`mrec-${id}`);
+    if(btn){btn.textContent='⏹ Stop';btn.style.background='#e74c3c';btn.style.color='#fff';}
+  }catch(e){alert('Microphone access denied.');}
+}
+function stopMuniRec(id){
+  const rec=muniRecorders[id]; if(!rec)return;
+  if(rec.mr&&rec.mr.state!=='inactive')rec.mr.stop();
+  clearInterval(rec.timer); muniRecorders[id]={active:false};
+  const btn=document.getElementById(`mrec-${id}`);
+  if(btn){btn.textContent='⏺ Record Audio';btn.style.background='transparent';btn.style.color='#e74c3c';}
+}
+function handleMuniUpload(e,id){
+  const file=e.target.files[0]; if(!file)return;
+  const url=URL.createObjectURL(file);
+  const m=data.munis.find(x=>x.id===id); if(!m)return;
+  if(!m.audioClips)m.audioClips=[];
+  m.audioClips.push({id:'a'+Date.now(),name:file.name,url,dur:null,created:Date.now()});
+  save();render(); e.target.value='';
+}
+function deleteMuniClip(id,ci){
+  const m=data.munis.find(x=>x.id===id); if(!m)return;
+  m.audioClips.splice(ci,1); save();render();
+}
+</script>
+
+
+
+
+</body></html>
